@@ -23,6 +23,10 @@ public final class ASTKindUtils {
         return ast instanceof RefExpr;
     }
     
+    public static boolean isUnaryOperator(AST ast) {
+        return ast instanceof UnaryOperator;
+    }
+    
     public static boolean isBinaryOperator(AST ast) {
         return ast instanceof BinaryOperator;
     }
