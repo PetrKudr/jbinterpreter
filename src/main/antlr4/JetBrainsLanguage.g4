@@ -46,11 +46,15 @@ fragment SCI_NOTATION: ('E' | 'e') [+-]? [0-9]+;
 
 program: (stmt)* EOF;
 
-stmt: LITERAL_VAR IDENTIFIER ASSIGN expr
-    | LITERAL_OUT expr
-    | LITERAL_OUT STRING;
+stmt: var_stmt
+    | out_stmt
+    | print_stmt;
 
-expr: additive_expr;
+var_stmt: LITERAL_VAR IDENTIFIER ASSIGN additive_expr;
+
+out_stmt: LITERAL_OUT additive_expr;
+
+print_stmt: LITERAL_PRINT STRING;
 
 additive_expr: multiplicative_expr ((PLUS | MINUS) multiplicative_expr)*;
 
@@ -60,21 +64,21 @@ power_expr: unary_expr (POWER unary_expr)*;
 
 unary_expr: (PLUS | MINUS)? atom;
 
-atom: LPAREN expr RPAREN 
+atom: LPAREN additive_expr RPAREN 
      | sequence
      | number
      | map_operator
      | reduce_operator
      | IDENTIFIER;
 
-map_operator: LITERAL_MAP LPAREN expr COMMA map_lambda RPAREN;
+map_operator: LITERAL_MAP LPAREN additive_expr COMMA map_lambda RPAREN;
               
-map_lambda: IDENTIFIER ARROW expr;
+map_lambda: IDENTIFIER ARROW additive_expr;
 
-reduce_operator: LITERAL_REDUCE LPAREN expr COMMA reduce_lambda RPAREN;
+reduce_operator: LITERAL_REDUCE LPAREN additive_expr COMMA additive_expr COMMA reduce_lambda RPAREN;
               
-reduce_lambda: IDENTIFIER IDENTIFIER ARROW expr;       
+reduce_lambda: IDENTIFIER IDENTIFIER ARROW additive_expr;       
 
-number: (PLUS | MINUS)? (INTEGER_NUMBER | DOUBLE_NUMBER);
+number: INTEGER_NUMBER | DOUBLE_NUMBER;
 
-sequence: LCURLY expr COMMA expr RCURLY;
+sequence: LCURLY additive_expr COMMA additive_expr RCURLY;
