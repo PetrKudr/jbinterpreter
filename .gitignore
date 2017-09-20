@@ -1,0 +1,5 @@
+/src/main/java/ru/spb/petrk/antlr4/*
+!/src/main/java/ru/spb/petrk/antlr4/README
+/target
+*.class
+*.jar
