@@ -34,6 +34,8 @@
                 <version>4.5</version>
                 <configuration>
                     <outputDirectory> ${basedir}/src/main/java/ru/spb/petrk/antlr4</outputDirectory>
+                    <listener>false</listener>
+                    <visitor>true</visitor>
                 </configuration>
                 <executions>
                     <execution>
