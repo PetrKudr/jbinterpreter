@@ -161,6 +161,10 @@ public class LexerTest extends TestCase {
             errors.add("line " + line + ":" + charPositionInLine + " " + msg);
         }
         
+        public void addError(String error) {
+            errors.add(error);
+        }
+        
         public boolean hasErrors() {
             return !errors.isEmpty();
         }
