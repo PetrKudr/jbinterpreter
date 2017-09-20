@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Trees;
@@ -91,7 +92,7 @@ public class ParserParseTreeTest extends TestCase {
         }
     }
     
-    public class TreePrinterListener extends JetBrainsLanguageBaseListener {
+    public class TreePrinterListener implements ParseTreeListener {
         
         private final static int INDENTATION = 2;
         
