@@ -9,7 +9,8 @@ import java.util.List;
 
 
 /**
- *
+ * Serves as a root for every AST node
+ * 
  * @author petrk
  */
 public interface Stmt {
