@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.ReduceOperator;
@@ -47,7 +48,7 @@ public class ReduceOperatorImpl implements ReduceOperator {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(sequence, neutralValue, lambda);
     }
 }

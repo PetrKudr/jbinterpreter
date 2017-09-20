@@ -8,6 +8,8 @@ package ru.spb.petrk.ast;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import ru.spb.petrk.antlr4.JetBrainsLanguageBaseVisitor;
@@ -16,16 +18,20 @@ import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.Multiplicative_exprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.Power_exprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.Unary_exprContext;
+import ru.spb.petrk.antlr4.JetBrainsLanguageVisitor;
 import ru.spb.petrk.ast.BinaryOperator.OpKind;
 import ru.spb.petrk.ast.impl.BinaryOperatorImpl;
 import ru.spb.petrk.ast.impl.FloatingLiteralImpl;
 import ru.spb.petrk.ast.impl.IntegerLiteralImpl;
 import ru.spb.petrk.ast.impl.LambdaExprImpl;
 import ru.spb.petrk.ast.impl.MapOperatorImpl;
+import ru.spb.petrk.ast.impl.OutStmtImpl;
+import ru.spb.petrk.ast.impl.PrintStmtImpl;
 import ru.spb.petrk.ast.impl.ProgramStmtImpl;
 import ru.spb.petrk.ast.impl.ReduceOperatorImpl;
 import ru.spb.petrk.ast.impl.RefExprImpl;
 import ru.spb.petrk.ast.impl.SequenceExprImpl;
+import ru.spb.petrk.ast.impl.StringLiteralImpl;
 import ru.spb.petrk.ast.impl.UnaryOperatorImpl;
 import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
 
@@ -33,7 +39,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
  *
  * @author petrk
  */
-public class ASTBuilder extends JetBrainsLanguageBaseVisitor<Stmt> {
+public class ASTBuilder extends AbstractParseTreeVisitor<AST> implements JetBrainsLanguageVisitor<AST> {
 
     @Override
     public ProgramStmt visitProgram(JetBrainsLanguageParser.ProgramContext ctx) {
@@ -44,10 +50,31 @@ public class ASTBuilder extends JetBrainsLanguageBaseVisitor<Stmt> {
     }
 
     @Override
+    public Stmt visitStmt(JetBrainsLanguageParser.StmtContext ctx) {
+        if (ctx.var_stmt() != null) {
+            return visitVar_stmt(ctx.var_stmt());
+        } else if (ctx.out_stmt() != null) {
+            return visitOut_stmt(ctx.out_stmt());
+        }
+        assert ctx.print_stmt() != null;
+        return visitPrint_stmt(ctx.print_stmt());
+    }
+
+    @Override
     public VarDeclStmt visitVar_stmt(JetBrainsLanguageParser.Var_stmtContext ctx) {
         String name = ctx.IDENTIFIER().getText();
         Expr expr = visitAdditive_expr(ctx.additive_expr());
         return new VarDeclStmtImpl(name, expr);
+    }
+
+    @Override
+    public OutStmt visitOut_stmt(JetBrainsLanguageParser.Out_stmtContext ctx) {
+        return new OutStmtImpl(visitAdditive_expr(ctx.additive_expr()));
+    }
+
+    @Override
+    public PrintStmt visitPrint_stmt(JetBrainsLanguageParser.Print_stmtContext ctx) {
+        return new PrintStmtImpl(new StringLiteralImpl(ctx.STRING().getText()));
     }
 
     @Override

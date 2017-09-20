@@ -11,55 +11,63 @@ package ru.spb.petrk.ast;
  */
 public final class ASTKindUtils {
     
-    public static boolean isExpr(Stmt stmt) {
-        return stmt instanceof Expr;
+    public static boolean isStmt(AST ast) {
+        return ast instanceof Stmt;
     }
     
-    public static boolean isRefExpr(Stmt stmt) {
-        return stmt instanceof RefExpr;
+    public static boolean isExpr(AST ast) {
+        return ast instanceof Expr;
     }
     
-    public static boolean isBinaryOperator(Stmt stmt) {
-        return stmt instanceof BinaryOperator;
+    public static boolean isRefExpr(AST ast) {
+        return ast instanceof RefExpr;
     }
     
-    public static boolean isMapOperator(Stmt stmt) {
-        return stmt instanceof MapOperator;
+    public static boolean isBinaryOperator(AST ast) {
+        return ast instanceof BinaryOperator;
     }
     
-    public static boolean isReduceOperator(Stmt stmt) {
-        return stmt instanceof ReduceOperator;
+    public static boolean isMapOperator(AST ast) {
+        return ast instanceof MapOperator;
     }
     
-    public static boolean isFloatingLiteral(Stmt stmt) {
-        return stmt instanceof FloatingLiteral;
+    public static boolean isReduceOperator(AST ast) {
+        return ast instanceof ReduceOperator;
     }
     
-    public static boolean isIntegerLiteral(Stmt stmt) {
-        return stmt instanceof IntegerLiteral;
+    public static boolean isFloatingLiteral(AST ast) {
+        return ast instanceof FloatingLiteral;
     }
     
-    public static boolean isStringLiteral(Stmt stmt) {
-        return stmt instanceof StringLiteral;
+    public static boolean isIntegerLiteral(AST ast) {
+        return ast instanceof IntegerLiteral;
     }
     
-    public static boolean isSequenceExpr(Stmt stmt) {
-        return stmt instanceof SequenceExpr;
+    public static boolean isStringLiteral(AST ast) {
+        return ast instanceof StringLiteral;
     }
     
-    public static boolean isLambdaExpr(Stmt stmt) {
-        return stmt instanceof LambdaExpr;
+    public static boolean isSequenceExpr(AST ast) {
+        return ast instanceof SequenceExpr;
     }
     
-    public static boolean isOutStmt(Stmt stmt) {
-        return stmt instanceof OutStmt;
+    public static boolean isLambdaExpr(AST ast) {
+        return ast instanceof LambdaExpr;
     }
     
-    public static boolean isPrintStmt(Stmt stmt) {
-        return stmt instanceof PrintStmt;
+    public static boolean isOutStmt(AST ast) {
+        return ast instanceof OutStmt;
     }
     
-    public static boolean isVarDeclStmt(Stmt stmt) {
-        return stmt instanceof VarDeclStmt;
+    public static boolean isPrintStmt(AST ast) {
+        return ast instanceof PrintStmt;
+    }
+    
+    public static boolean isVarDeclStmt(AST ast) {
+        return ast instanceof VarDeclStmt;
+    }
+    
+    public static boolean isProgramStmt(AST ast) {
+        return ast instanceof ProgramStmt;
     }
 }

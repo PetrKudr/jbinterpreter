@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Collections;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.StringLiteral;
 
@@ -28,7 +29,7 @@ public class StringLiteralImpl implements StringLiteral {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Collections.emptyList();
     }
 }

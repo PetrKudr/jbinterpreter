@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.OutStmt;
 import ru.spb.petrk.ast.Stmt;
@@ -29,7 +30,7 @@ public class OutStmtImpl implements OutStmt {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(expr);
     }
 }

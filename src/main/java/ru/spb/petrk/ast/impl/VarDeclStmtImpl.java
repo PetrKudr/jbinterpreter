@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.VarDeclStmt;
@@ -37,7 +38,7 @@ public class VarDeclStmtImpl implements VarDeclStmt {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(initializer);
     }
 }

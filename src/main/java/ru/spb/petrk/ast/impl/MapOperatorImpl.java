@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.MapOperator;
@@ -38,7 +39,7 @@ public class MapOperatorImpl implements MapOperator {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(sequence, lambda);
     }
 }

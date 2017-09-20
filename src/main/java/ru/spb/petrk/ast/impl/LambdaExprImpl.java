@@ -8,9 +8,9 @@ package ru.spb.petrk.ast.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
-import ru.spb.petrk.ast.Stmt;
 
 /**
  *
@@ -38,7 +38,7 @@ public class LambdaExprImpl implements LambdaExpr {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(body);
     }
 }

@@ -7,6 +7,7 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.SequenceExpr;
 import ru.spb.petrk.ast.Stmt;
@@ -37,7 +38,7 @@ public class SequenceExprImpl implements SequenceExpr {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Arrays.asList(LHS, RHS);
     }
 }

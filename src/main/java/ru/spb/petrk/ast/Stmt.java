@@ -9,11 +9,9 @@ import java.util.List;
 
 
 /**
- * Serves as a root for every AST node
  * 
  * @author petrk
  */
-public interface Stmt {
-    
-    List<Stmt> getChildren();
+public interface Stmt extends AST {
+    // Just a marker interface for now
 }

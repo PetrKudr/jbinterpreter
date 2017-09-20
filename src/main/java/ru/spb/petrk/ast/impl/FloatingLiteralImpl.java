@@ -7,8 +7,8 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Collections;
 import java.util.List;
+import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.FloatingLiteral;
-import ru.spb.petrk.ast.Stmt;
 
 /**
  *
@@ -28,7 +28,7 @@ public class FloatingLiteralImpl implements FloatingLiteral {
     }
 
     @Override
-    public List<Stmt> getChildren() {
+    public List<AST> getChildren() {
         return Collections.emptyList();
     }
 }

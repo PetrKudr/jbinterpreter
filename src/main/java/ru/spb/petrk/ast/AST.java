@@ -5,11 +5,14 @@
  */
 package ru.spb.petrk.ast;
 
+import java.util.List;
+
 /**
- * Serves as a root for every AST node
- * 
+ * Serves as root for any AST node
+ *
  * @author petrk
  */
-public interface Expr extends AST {
-    // Just a marker interface for now
+public interface AST {
+    
+    List<? extends AST> getChildren();
 }
