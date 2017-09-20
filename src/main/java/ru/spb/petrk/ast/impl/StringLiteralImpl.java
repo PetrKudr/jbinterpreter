@@ -1,0 +1,34 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ru.spb.petrk.ast.impl;
+
+import java.util.Collections;
+import java.util.List;
+import ru.spb.petrk.ast.Stmt;
+import ru.spb.petrk.ast.StringLiteral;
+
+/**
+ *
+ * @author petrk
+ */
+public class StringLiteralImpl implements StringLiteral {
+    
+    private final String string;
+
+    public StringLiteralImpl(String string) {
+        this.string = string;
+    }
+
+    @Override
+    public String getString() {
+        return string;
+    }
+
+    @Override
+    public List<Stmt> getChildren() {
+        return Collections.emptyList();
+    }
+}
