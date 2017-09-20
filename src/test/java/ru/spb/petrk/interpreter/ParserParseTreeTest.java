@@ -5,20 +5,15 @@
  */
 package ru.spb.petrk.interpreter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junit.framework.TestCase;
-import org.antlr.runtime.tree.DOTTreeGenerator;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -27,9 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.junit.Test;
-import ru.spb.petrk.antlr4.JetBrainsLanguageBaseListener;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
-import ru.spb.petrk.antlr4.JetBrainsLanguageListener;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
 import ru.spb.petrk.interpreter.LexerTest.AccumulatingErrorsListener;
 
