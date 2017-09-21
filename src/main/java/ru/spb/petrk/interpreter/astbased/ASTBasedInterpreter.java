@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.astbased;
 
+import ru.spb.petrk.interpreter.InterpreterException;
 import ru.spb.petrk.interpreter.astbased.model.impl.IntSequenceValue;
 import ru.spb.petrk.interpreter.astbased.model.impl.StringValueImpl;
 import ru.spb.petrk.interpreter.astbased.model.impl.MapSequenceValue;
@@ -35,6 +36,7 @@ import ru.spb.petrk.ast.StringLiteral;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
 import ru.spb.petrk.interpreter.Interpreter;
+import ru.spb.petrk.interpreter.InterruptedInterpreterException;
 import ru.spb.petrk.interpreter.astbased.model.FloatingValue;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
 import ru.spb.petrk.interpreter.astbased.model.NumberValue;
@@ -59,7 +61,10 @@ public final class ASTBasedInterpreter implements Interpreter {
         try {
             interpret(program, new HashMap<>(), out);
             return true;
-        } catch (ASTBasedInterpretException ex) {
+        } catch (InterruptedInterpreterException ex) {
+            // Just return
+            return false;
+        } catch (InterpreterException ex) {
             err.println("Interpret exception!");
             return false;
         }
@@ -83,7 +88,15 @@ public final class ASTBasedInterpreter implements Interpreter {
             this.out = out;
             this.symTab = symTab;
         }
-        
+
+        @Override
+        public Value visit(AST ast) {
+            if (Thread.interrupted()) {
+                throw new InterruptedInterpreterException();
+            }
+            return ASTVisitor.super.visit(ast);
+        }
+
         public Value eval(AST expr) {
             return visit(expr);
         }
@@ -91,7 +104,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         public <T extends Value> T eval(Class<T> cls, AST expr) {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
-                throw new ASTBasedInterpretException();
+                throw new InterpreterException();
             }
             return (T) val;
         }
@@ -191,7 +204,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         public Value visitRefExpr(RefExpr expr) {
             Value val = symTab.get(expr.getName());
             if (val == null) {
-                throw new ASTBasedInterpretException();
+                throw new InterpreterException();
             }
             return val;
         }

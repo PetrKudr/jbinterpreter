@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.spb.petrk.interpreter.astbased;
+package ru.spb.petrk.interpreter;
 
 /**
  *
  * @author petrk
  */
-public class ASTBasedInterpretException extends RuntimeException {
+public class InterpreterException extends RuntimeException {
     
 }
