@@ -46,39 +46,39 @@ fragment SCI_NOTATION: ('E' | 'e') [+-]? [0-9]+;
 
 program: (stmt)* EOF;
 
-stmt: var_stmt
-    | out_stmt
-    | print_stmt;
+stmt: varStmt
+    | outStmt
+    | printStmt;
 
-var_stmt: LITERAL_VAR IDENTIFIER ASSIGN additive_expr;
+varStmt: LITERAL_VAR IDENTIFIER ASSIGN additiveExpr;
 
-out_stmt: LITERAL_OUT additive_expr;
+outStmt: LITERAL_OUT additiveExpr;
 
-print_stmt: LITERAL_PRINT STRING;
+printStmt: LITERAL_PRINT STRING;
 
-additive_expr: multiplicative_expr ((PLUS | MINUS) multiplicative_expr)*;
+additiveExpr: multiplicativeExpr ((PLUS | MINUS) multiplicativeExpr)*;
 
-multiplicative_expr: power_expr ((STAR | DIVIDE) power_expr)*;
+multiplicativeExpr: powerExpr ((STAR | DIVIDE) powerExpr)*;
 
-power_expr: unary_expr (POWER unary_expr)*;
+powerExpr: unaryExpr (POWER unaryExpr)*;
 
-unary_expr: (PLUS | MINUS)? atom;
+unaryExpr: (PLUS | MINUS)? atom;
 
-atom: LPAREN additive_expr RPAREN 
+atom: LPAREN additiveExpr RPAREN 
      | sequence
      | number
-     | map_operator
-     | reduce_operator
+     | mapOperator
+     | reduceOperator
      | IDENTIFIER;
 
-map_operator: LITERAL_MAP LPAREN additive_expr COMMA map_lambda RPAREN;
+mapOperator: LITERAL_MAP LPAREN additiveExpr COMMA mapLambda RPAREN;
               
-map_lambda: IDENTIFIER ARROW additive_expr;
+mapLambda: IDENTIFIER ARROW additiveExpr;
 
-reduce_operator: LITERAL_REDUCE LPAREN additive_expr COMMA additive_expr COMMA reduce_lambda RPAREN;
+reduceOperator: LITERAL_REDUCE LPAREN additiveExpr COMMA additiveExpr COMMA reduceLambda RPAREN;
               
-reduce_lambda: IDENTIFIER IDENTIFIER ARROW additive_expr;       
+reduceLambda: IDENTIFIER IDENTIFIER ARROW additiveExpr;       
 
 number: INTEGER_NUMBER | DOUBLE_NUMBER;
 
-sequence: LCURLY additive_expr COMMA additive_expr RCURLY;
+sequence: LCURLY additiveExpr COMMA additiveExpr RCURLY;
