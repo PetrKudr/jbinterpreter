@@ -123,7 +123,7 @@ public class LexerTest extends TestCase {
     private String lex(String input) {
         CharStream inputStream = new ANTLRInputStream(input);
         JetBrainsLanguageLexer lexer = new JetBrainsLanguageLexer(inputStream);
-        
+        lexer.removeErrorListeners();
         AccumulatingErrorsListener errorsListener = new AccumulatingErrorsListener();
         lexer.addErrorListener(errorsListener);
         TokenStream tokenStream = new CommonTokenStream(lexer);
