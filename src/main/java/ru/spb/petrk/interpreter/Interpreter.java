@@ -5,18 +5,21 @@
  */
 package ru.spb.petrk.interpreter;
 
+import java.io.PrintStream;
+
 /**
  *
  * @author petrk
  */
-public class Interpreter {
+public interface Interpreter {
     
-    private final String input;
-
-    public Interpreter(String input) {
-        this.input = input;
-    }
-    
-    
-    
+    /**
+     * Interprets input
+     * 
+     * @param input - code
+     * @param out - out print stream
+     * @param err - err print stream
+     * @return true if no errors occured, false otherwise
+     */
+    boolean interpret(String input, PrintStream out, PrintStream err);
 }
