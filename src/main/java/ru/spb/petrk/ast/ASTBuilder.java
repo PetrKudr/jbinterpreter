@@ -36,7 +36,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
  *
  * @author petrk
  */
-public class ASTBuilder extends AbstractParseTreeVisitor<AST> implements JetBrainsLanguageVisitor<AST> {
+/*package*/ class ASTBuilder extends AbstractParseTreeVisitor<AST> implements JetBrainsLanguageVisitor<AST> {
 
     @Override
     public ProgramStmt visitProgram(JetBrainsLanguageParser.ProgramContext ctx) {
