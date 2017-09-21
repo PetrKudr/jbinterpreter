@@ -10,5 +10,8 @@ package ru.spb.petrk.interpreter;
  * @author petrk
  */
 public class InterruptedInterpreterException extends InterpreterException {
-    
+
+    public InterruptedInterpreterException() {
+        super(null);
+    }
 }

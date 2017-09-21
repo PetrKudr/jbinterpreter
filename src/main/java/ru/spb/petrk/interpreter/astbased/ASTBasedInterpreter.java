@@ -41,7 +41,9 @@ import ru.spb.petrk.interpreter.astbased.model.FloatingValue;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
 import ru.spb.petrk.interpreter.astbased.model.NumberValue;
 import ru.spb.petrk.interpreter.astbased.model.SequenceValue;
+import ru.spb.petrk.interpreter.astbased.model.StringValue;
 import ru.spb.petrk.interpreter.astbased.model.Value;
+import ru.spb.petrk.interpreter.astbased.model.VoidValue;
 import ru.spb.petrk.interpreter.astbased.model.impl.VoidValueImpl;
 
 /**
@@ -65,7 +67,8 @@ public final class ASTBasedInterpreter implements Interpreter {
             // Just return
             return false;
         } catch (InterpreterException ex) {
-            err.println("Interpret exception!");
+            assert ex.getMessage() != null;
+            err.println(ex.getMessage());
             return false;
         }
     }
@@ -104,7 +107,10 @@ public final class ASTBasedInterpreter implements Interpreter {
         public <T extends Value> T eval(Class<T> cls, AST expr) {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
-                throw new InterpreterException();
+                throw new InterpreterException(
+                        "Mismatched types: expected \"" + getValueType(cls) + "\"," 
+                                + " but found \"" + getValueType(val.getClass()) + "\""
+                );
             }
             return (T) val;
         }
@@ -204,7 +210,9 @@ public final class ASTBasedInterpreter implements Interpreter {
         public Value visitRefExpr(RefExpr expr) {
             Value val = symTab.get(expr.getName());
             if (val == null) {
-                throw new InterpreterException();
+                throw new InterpreterException(
+                        "Unresolved variable: \"" + expr.getName() + "\""
+                );
             }
             return val;
         }
@@ -253,6 +261,23 @@ public final class ASTBasedInterpreter implements Interpreter {
 
         private static boolean isFloatingValue(Value val) {
             return val instanceof FloatingValue;
+        }
+        
+        private static String getValueType(Class<? extends Value> cls) {
+            if (IntValue.class.isAssignableFrom(cls)) {
+                return "Integer";
+            } else if (FloatingValue.class.isAssignableFrom(cls)) {
+                return "Float";
+            } else if (StringValue.class.isAssignableFrom(cls)) {
+                return "String";
+            } else if (SequenceValue.class.isAssignableFrom(cls)) {
+                return "Sequence";
+            } else if (NumberValue.class.isAssignableFrom(cls)) {
+                return "Number";
+            } else if (VoidValue.class.isAssignableFrom(cls)) {
+                return "Void";
+            }
+            return "Unexpected value type!";
         }
     }
 }

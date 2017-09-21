@@ -10,5 +10,8 @@ package ru.spb.petrk.interpreter;
  * @author petrk
  */
 public class InterpreterException extends RuntimeException {
-    
+
+    public InterpreterException(String message) {
+        super(message);
+    }
 }
