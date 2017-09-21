@@ -23,7 +23,10 @@ public class InterpreterTest extends TestCase {
     
     @Test
     public void testHelloWorld() throws Exception {
-        assertEquals("Hello, World!", interpret("print \"Hello, World!\""));
+        assertEquals(
+                "Hello, World!", 
+                interpret("print \"Hello, World!\"")
+        );
     }
     
     @Test
