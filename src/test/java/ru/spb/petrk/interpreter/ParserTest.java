@@ -51,6 +51,24 @@ public class ParserTest {
     }
     
     @Test
+    public void testMapOperatorWithPower() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    MapOperator \n" +
+                "      SequenceExpr \n" +
+                "        IntegerLiteral 0\n" +
+                "        IntegerLiteral 10\n" +
+                "      LambdaExpr [i]\n" +
+                "        BinaryOperator ^\n" +
+                "          UnaryOperator -\n" +
+                "            IntegerLiteral 1\n" +
+                "          RefExpr i\n",
+                parse("out map({0, 10}, i -> (-1)^i)")
+        );
+    }
+    
+    @Test
     public void testExampleProgram() throws Exception {
         assertEquals(
                 "ProgramStmt \n" +
