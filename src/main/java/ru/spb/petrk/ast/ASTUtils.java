@@ -12,9 +12,14 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
@@ -27,7 +32,7 @@ public final class ASTUtils {
     
     public static final ProgramStmt parse(String input, List<String> errors) {
         assert errors.isEmpty();
-        ParserErrorsListener errorsListener = new ParserErrorsListener(errors);
+        ParserErrorsListener errorsListener = new ParserErrorsListener();
         
         // Init lexer
         CharStream inputStream = new ANTLRInputStream(input);
@@ -40,14 +45,26 @@ public final class ASTUtils {
         // Init parser
         JetBrainsLanguageParser parser = new JetBrainsLanguageParser(tokenStream);
         parser.removeErrorListeners();
-        parser.setErrorHandler(new BailErrorStrategy());
+        parser.addErrorListener(errorsListener);
+        parser.setErrorHandler(new ExceptionErrorStrategy());
         
         ASTBuilder builder = new ASTBuilder();
         ProgramStmt ast;
         try {
             ast = builder.visitProgram(parser.program());
         } catch (ParseCancellationException ex) {
-            errorsListener.addError("Parse error!");
+            if (ex.getMessage() != null) {
+                errors.add(ex.getMessage());
+            } else {
+                errors.add("Unrecognized parse error!");
+            }
+            ast = null;
+        } catch (RuntimeException ex) {
+            if (ex.getMessage() != null) {
+                errors.add(ex.getMessage());
+            } else {
+                errors.add("Unrecognized lex or parse error!");
+            }
             ast = null;
         }
         return ast;
@@ -55,25 +72,56 @@ public final class ASTUtils {
     
     private static final class ParserErrorsListener extends BaseErrorListener {
         
-        private final List<String> errors;
-
-        public ParserErrorsListener(List<String> errors) {
-            this.errors = errors;
-        }
-        
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                 int line, int charPositionInLine,
                 String msg, RecognitionException e) {
-            errors.add("line " + line + ":" + charPositionInLine + " " + msg);
+            throw new ParseCancellationException(
+                    "line " + line + ":" + charPositionInLine + " " + msg, 
+                    e
+            );
+        }
+    }
+    
+    private static class ExceptionErrorStrategy extends DefaultErrorStrategy {
+
+        @Override
+        public void recover(Parser recognizer, RecognitionException e) {
+            // Do not recover
+            throw e;
         }
         
-        public void addError(String error) {
-            errors.add(error);
+        private String position(int line, int column) {
+            return "line " + line + ":" + column + " ";
         }
-        
-        public boolean hasErrors() {
-            return !errors.isEmpty();
+
+        @Override
+        public void reportInputMismatch(Parser recognizer, InputMismatchException e) throws RecognitionException {
+            Token tok = e.getOffendingToken();
+            String msg = position(tok.getLine(), tok.getCharPositionInLine()) + 
+                    "mismatched input " 
+                    + getTokenErrorDisplay(tok) 
+                    + " expecting one of " 
+                    + e.getExpectedTokens().toString(recognizer.getVocabulary());
+            RecognitionException ex = new RecognitionException(
+                    msg, 
+                    recognizer, 
+                    recognizer.getInputStream(), 
+                    recognizer.getContext()
+            );
+            ex.initCause(e);
+            throw ex;
+        }
+
+        @Override
+        public void reportMissingToken(Parser recognizer) {
+            beginErrorCondition(recognizer);
+            Token tok = recognizer.getCurrentToken();
+            IntervalSet expecting = getExpectedTokens(recognizer);
+            String msg = position(tok.getLine(), tok.getCharPositionInLine()) 
+                    + "missing " + expecting.toString(recognizer.getVocabulary()) 
+                    + " at " + getTokenErrorDisplay(tok);
+            throw new RecognitionException(msg, recognizer, recognizer.getInputStream(), recognizer.getContext());
         }
     }
 }
