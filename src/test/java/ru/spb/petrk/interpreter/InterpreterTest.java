@@ -38,6 +38,24 @@ public class InterpreterTest extends TestCase {
     }
     
     @Test
+    public void testPowerOperator() throws Exception {
+        assertEquals(
+                "512\n" + 
+                "512\n" + 
+                "64",
+                interpret(
+                        "out 2 ^ 3 ^ 2\n" +
+                        "print \"\n" +
+                        "\"\n" +
+                        "out (2 ^ (3 ^ 2))\n" +
+                        "print \"\n" +
+                        "\"\n" +
+                        "out ((2 ^ 3) ^ 2)"
+                )
+        );
+    }
+    
+    @Test
     public void testCalcPi() throws Exception {
         assertEquals(
                 "pi = 3.143588659585789",
