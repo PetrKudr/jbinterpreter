@@ -35,7 +35,7 @@ LITERAL_PRINT: 'print';
 
 DOUBLE_NUMBER: [0-9]+ ('.' [0-9]+ (SCI_NOTATION)? | SCI_NOTATION);
 INTEGER_NUMBER: [0-9]+;
-STRING: '"' ('\\\\' | '\\"' | ~('\r' | '\n' | '"'))* '"';
+STRING: '"' .*? '"';
 IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]*;
 WHITESPACE: [ \t\r\n]+ -> skip;
 
