@@ -116,8 +116,8 @@ public class LexerTest extends TestCase {
     
     @Test
     public void testLexerError() throws Exception {
-        assertEquals("line 1:6 token recognition error at: '.'", lex("abc123.54"));
-        assertEquals("line 1:6 token recognition error at: '.'", lex("abc123.54 123E-1"));
+        assertEquals("[line 1:6 token recognition error at: '.']", lex("abc123.54"));
+        assertEquals("[line 1:6 token recognition error at: '.']", lex("abc123.54 123E-1"));
     }
     
     private String lex(String input) {
@@ -146,7 +146,7 @@ public class LexerTest extends TestCase {
             sb.append("[EOF]");
             return sb.toString();
         } else {
-            return errorsListener.getErrorsAsString();
+            return errorsListener.errors.toString();
         }
     }
     
@@ -167,17 +167,6 @@ public class LexerTest extends TestCase {
         
         public boolean hasErrors() {
             return !errors.isEmpty();
-        }
-        
-        public String getErrorsAsString() {
-            StringBuilder sb = new StringBuilder();
-            for (String error : errors) {
-                if (sb.length() > 0) {
-                    sb.append('\n');
-                }
-                sb.append(error);
-            }
-            return sb.toString();
         }
     }
 }

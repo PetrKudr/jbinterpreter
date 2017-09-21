@@ -5,6 +5,8 @@
  */
 package ru.spb.petrk.interpreter;
 
+import java.util.ArrayList;
+import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -18,8 +20,8 @@ import org.junit.Test;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
 import ru.spb.petrk.ast.AST;
-import ru.spb.petrk.ast.ASTBuilder;
 import ru.spb.petrk.ast.ASTKindUtils;
+import ru.spb.petrk.ast.ASTUtils;
 import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.FloatingLiteral;
 import ru.spb.petrk.ast.IntegerLiteral;
@@ -95,33 +97,12 @@ public class ParserTest {
     }
     
     private String parse(String input) {
-        AccumulatingErrorsListener errorsListener = new AccumulatingErrorsListener();
-        
-        // Init lexer
-        CharStream inputStream = new ANTLRInputStream(input);
-        JetBrainsLanguageLexer lexer = new JetBrainsLanguageLexer(inputStream);
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errorsListener);
-        
-        TokenStream tokenStream = new CommonTokenStream(lexer);
-        
-        // Init parser
-        JetBrainsLanguageParser parser = new JetBrainsLanguageParser(tokenStream);
-        parser.removeErrorListeners();
-        parser.setErrorHandler(new BailErrorStrategy());
-        
-        ASTBuilder builder = new ASTBuilder();
-        ProgramStmt ast;
-        try {
-            ast = builder.visitProgram(parser.program());
-        } catch (ParseCancellationException ex) {
-            errorsListener.addError("Parse error!");
-            ast = null;
-        }
-        if (!errorsListener.hasErrors()) {
-            return ast2String(ast);
+        List<String> errors = new ArrayList<>();
+        ProgramStmt program = ASTUtils.parse(input, errors);
+        if (program != null) {
+            return ast2String(program);
         } else {
-            return errorsListener.getErrorsAsString();
+            return errors.toString();
         }
     }
     
