@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ru.spb.petrk.interpreter;
+package ru.spb.petrk.interpreter.astbased;
 
 /**
  *
  * @author petrk
  */
-public class InterpreterException extends RuntimeException {
+/*package*/ class ASTInterruptedInterpreterException extends ASTInterpreterException {
 
-    public InterpreterException(String message) {
-        super(message);
+    public ASTInterruptedInterpreterException() {
+        super(null);
     }
 }

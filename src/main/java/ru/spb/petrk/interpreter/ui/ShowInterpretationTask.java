@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import ru.spb.petrk.interpreter.Interpreter;
-import ru.spb.petrk.interpreter.astbased.ASTBasedInterpreter;
+import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 
 /**
  *
@@ -40,7 +40,7 @@ public class ShowInterpretationTask implements Runnable {
     public void run() {
         output.setText("");
         PrintStream out = new PrintStream(new TextAreaOutputStream());
-        Interpreter interpreter = new ASTBasedInterpreter();
+        Interpreter interpreter = new ASTInterpreter();
         interpreter.interpret(input, out, out);
     }
     

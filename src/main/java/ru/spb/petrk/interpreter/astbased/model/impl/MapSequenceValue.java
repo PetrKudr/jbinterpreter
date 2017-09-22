@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
 import ru.spb.petrk.ast.LambdaExpr;
-import ru.spb.petrk.interpreter.astbased.ASTBasedInterpreter;
+import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 import ru.spb.petrk.interpreter.astbased.model.SequenceValue;
 import ru.spb.petrk.interpreter.astbased.model.Value;
 
@@ -40,7 +40,7 @@ public final class MapSequenceValue implements SequenceValue {
 
             @Override
             public Value next() {
-                return new ASTBasedInterpreter().interpret(
+                return new ASTInterpreter().interpret(
                         lambda.getBody(), 
                         symTabOf(orig.next())
                 );
@@ -50,7 +50,7 @@ public final class MapSequenceValue implements SequenceValue {
 
     @Override
     public Stream<Value> stream() {
-        return sequence.stream().map(val -> new ASTBasedInterpreter().interpret(
+        return sequence.stream().map(val -> new ASTInterpreter().interpret(
                 lambda.getBody(),
                 symTabOf(val)
         ));

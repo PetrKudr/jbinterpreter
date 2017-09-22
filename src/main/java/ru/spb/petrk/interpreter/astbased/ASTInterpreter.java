@@ -5,7 +5,6 @@
  */
 package ru.spb.petrk.interpreter.astbased;
 
-import ru.spb.petrk.interpreter.InterpreterException;
 import ru.spb.petrk.interpreter.astbased.model.impl.IntSequenceValue;
 import ru.spb.petrk.interpreter.astbased.model.impl.StringValueImpl;
 import ru.spb.petrk.interpreter.astbased.model.impl.MapSequenceValue;
@@ -37,7 +36,6 @@ import ru.spb.petrk.ast.StringLiteral;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
 import ru.spb.petrk.interpreter.Interpreter;
-import ru.spb.petrk.interpreter.InterruptedInterpreterException;
 import ru.spb.petrk.interpreter.astbased.model.FloatingValue;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
 import ru.spb.petrk.interpreter.astbased.model.NumberValue;
@@ -51,7 +49,7 @@ import ru.spb.petrk.interpreter.astbased.model.impl.VoidValueImpl;
  *
  * @author petrk
  */
-public final class ASTBasedInterpreter implements Interpreter {
+public final class ASTInterpreter implements Interpreter {
     
     @Override
     public boolean interpret(String input, PrintStream out, PrintStream err) {
@@ -64,10 +62,10 @@ public final class ASTBasedInterpreter implements Interpreter {
         try {
             interpret(program, new HashMap<>(), out);
             return true;
-        } catch (InterruptedInterpreterException ex) {
+        } catch (ASTInterruptedInterpreterException ex) {
             // Just return
             return false;
-        } catch (InterpreterException ex) {
+        } catch (ASTInterpreterException ex) {
             assert ex.getMessage() != null;
             err.println(ex.getMessage());
             return false;
@@ -96,7 +94,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         @Override
         public Value visit(AST ast) {
             if (Thread.interrupted()) {
-                throw new InterruptedInterpreterException();
+                throw new ASTInterruptedInterpreterException();
             }
             return ASTVisitor.super.visit(ast);
         }
@@ -108,7 +106,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         public <T extends Value> T eval(Class<T> cls, AST expr) {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
-                throw new InterpreterException(
+                throw new ASTInterpreterException(
                         position(expr) + "mismatched types: " 
                                 + "expected \"" + getValueType(cls) + "\"," 
                                 + " but found \"" + getValueType(val.getClass()) + "\""
@@ -177,7 +175,7 @@ public final class ASTBasedInterpreter implements Interpreter {
                 Map<String, Value> lambdaSymTab = new HashMap(2);
                 lambdaSymTab.put(op.getLambda().getParams().get(0), left);
                 lambdaSymTab.put(op.getLambda().getParams().get(1), right);
-                return new ASTBasedInterpreter().interpret(
+                return new ASTInterpreter().interpret(
                         op.getLambda().getBody(), 
                         lambdaSymTab
                 );
@@ -214,7 +212,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         public Value visitRefExpr(RefExpr expr) {
             Value val = symTab.get(expr.getName());
             if (val == null) {
-                throw new InterpreterException(
+                throw new ASTInterpreterException(
                         position(expr) + "unresolved variable: \"" + expr.getName() + "\""
                 );
             }
@@ -229,7 +227,7 @@ public final class ASTBasedInterpreter implements Interpreter {
         @Override
         public Value visitVarDeclStmt(VarDeclStmt stmt) {
             if (symTab.containsKey(stmt.getName())) {
-                throw new InterpreterException(
+                throw new ASTInterpreterException(
                         position(stmt) + "redeclaration of variable "
                                 + "\"" + stmt.getName() + "\""
                 );

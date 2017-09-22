@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import junit.framework.TestCase;
 import org.junit.Test;
-import ru.spb.petrk.interpreter.astbased.ASTBasedInterpreter;
+import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 
 /**
  *
@@ -101,6 +101,6 @@ public class InterpreterTest extends TestCase {
     }
     
     private Interpreter createInterpreter() {
-        return new ASTBasedInterpreter();
+        return new ASTInterpreter();
     }
 }
