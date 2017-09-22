@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ASTUtils;
+import static ru.spb.petrk.ast.ASTUtils.position;
 import ru.spb.petrk.ast.ASTVisitor;
 import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.FloatingLiteral;
@@ -279,10 +280,6 @@ public final class ASTBasedInterpreter implements Interpreter {
                 return "Void";
             }
             return "Unexpected value type!";
-        }
-        
-        private static String position(AST ast) {
-            return "line " + ast.getLine() + ":" + (ast.getColumn() + 1) + " ";
         }
     }
 }

@@ -70,6 +70,14 @@ public final class ASTUtils {
         return ast;
     }
     
+    public static String position(AST ast) {
+        return position(ast.getLine(), ast.getColumn());
+    }
+    
+    public static String position(int line, int column) {
+        return "line " + line + ":" + (column + 1) + " ";
+    }
+    
     private static final class ParserErrorsListener extends BaseErrorListener {
         
         @Override
@@ -77,7 +85,7 @@ public final class ASTUtils {
                 int line, int charPositionInLine,
                 String msg, RecognitionException e) {
             throw new ParseCancellationException(
-                    "line " + line + ":" + charPositionInLine + " " + msg, 
+                    position(line, charPositionInLine) + msg, 
                     e
             );
         }
@@ -89,10 +97,6 @@ public final class ASTUtils {
         public void recover(Parser recognizer, RecognitionException e) {
             // Do not recover
             throw e;
-        }
-        
-        private String position(int line, int column) {
-            return "line " + line + ":" + column + " ";
         }
 
         @Override
