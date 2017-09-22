@@ -201,11 +201,19 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             }
         }
         assert ctx.DOUBLE_NUMBER() != null;
-        return new FloatingLiteralImpl(
-                Double.parseDouble(ctx.DOUBLE_NUMBER().getSymbol().getText()),
-                line,
-                column
-        );
+        try {
+            return new FloatingLiteralImpl(
+                    Double.parseDouble(ctx.DOUBLE_NUMBER().getSymbol().getText()),
+                    line,
+                    column
+            );
+        } catch (NumberFormatException ex) {
+            throw new NumberFormatException(
+                    ASTUtils.position(line, column) + "number \"" 
+                            + ctx.DOUBLE_NUMBER().getText() 
+                            + "\" is too big"
+            );
+        }
     }
 
     @Override
