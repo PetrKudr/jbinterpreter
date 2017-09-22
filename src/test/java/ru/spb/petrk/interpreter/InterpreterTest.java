@@ -56,6 +56,20 @@ public class InterpreterTest extends TestCase {
     }
     
     @Test
+    public void testSequenceOfSequences() throws Exception {
+        assertEquals(
+                "Sum([[1], [1, 2], [1, 2, 3]]) = 10",
+                interpret(
+                        "var seqOfSeq = map({1, 3}, val->{1, val})\n" +
+                        "print \"Sum(\" \n" +
+                        "out seqOfSeq\n" +
+                        "print \") = \"\n" +
+                        "out reduce(seqOfSeq, 0, l r -> l + reduce(r, 0, l r -> l + r))"
+                )
+        );
+    }
+    
+    @Test
     public void testCalcPi() throws Exception {
         assertEquals(
                 "pi = 3.143588659585789",
