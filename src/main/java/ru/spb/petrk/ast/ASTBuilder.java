@@ -8,6 +8,7 @@ package ru.spb.petrk.ast;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
@@ -257,9 +258,16 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     public LambdaExpr visitReduceLambda(JetBrainsLanguageParser.ReduceLambdaContext ctx) {
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
+        assert ctx.IDENTIFIER().size() == 2 : "Reduce lambda with more than 2 parameters?";
+        if (ctx.IDENTIFIER(0).getText().equals(ctx.IDENTIFIER(1).getText())) {
+            throw new ParseCancellationException(
+                    ASTUtils.position(line, column) 
+                            + " parameters of the lambda cannot have the same name"
+            );
+        }
         return new LambdaExprImpl(
                 ctx.IDENTIFIER().stream()
-                        .map(id -> id.getSymbol().getText())
+                        .map(id -> id.getText())
                         .collect(Collectors.toList()), 
                 visitAdditiveExpr(ctx.additiveExpr()),
                 line,
