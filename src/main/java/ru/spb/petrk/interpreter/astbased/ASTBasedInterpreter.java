@@ -228,6 +228,12 @@ public final class ASTBasedInterpreter implements Interpreter {
 
         @Override
         public Value visitVarDeclStmt(VarDeclStmt stmt) {
+            if (symTab.containsKey(stmt.getName())) {
+                throw new InterpreterException(
+                        position(stmt) + "redeclaration of variable "
+                                + "\"" + stmt.getName() + "\""
+                );
+            }
             Value varValue = eval(stmt.getInitializer());
             symTab.put(stmt.getName(), varValue);
             return VoidValueImpl.INSTANCE;
