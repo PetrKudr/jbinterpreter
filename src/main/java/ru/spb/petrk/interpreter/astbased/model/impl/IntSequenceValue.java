@@ -6,6 +6,9 @@
 package ru.spb.petrk.interpreter.astbased.model.impl;
 
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
 import ru.spb.petrk.interpreter.astbased.model.SequenceValue;
 import ru.spb.petrk.interpreter.astbased.model.Value;
@@ -42,6 +45,13 @@ public final class IntSequenceValue implements SequenceValue {
                 return new IntValueImpl(current++);
             }
         };
+    }
+
+    @Override
+    public Stream<Value> stream() {
+        final int from = left.value();
+        final int to = right.value();
+        return IntStream.rangeClosed(from, to).mapToObj(i -> new IntValueImpl(i));
     }
 
     @Override

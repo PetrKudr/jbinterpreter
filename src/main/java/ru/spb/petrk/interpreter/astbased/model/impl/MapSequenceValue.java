@@ -8,6 +8,7 @@ package ru.spb.petrk.interpreter.astbased.model.impl;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Stream;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.interpreter.astbased.ASTBasedInterpreter;
 import ru.spb.petrk.interpreter.astbased.model.SequenceValue;
@@ -39,11 +40,20 @@ public final class MapSequenceValue implements SequenceValue {
 
             @Override
             public Value next() {
-                final Map<String, Value> symTab = new HashMap<>(1);
-                symTab.put(lambda.getParams().get(0), orig.next());
-                return new ASTBasedInterpreter().interpret(lambda.getBody(), symTab);
+                return new ASTBasedInterpreter().interpret(
+                        lambda.getBody(), 
+                        symTabOf(orig.next())
+                );
             }
         };
+    }
+
+    @Override
+    public Stream<Value> stream() {
+        return sequence.stream().map(val -> new ASTBasedInterpreter().interpret(
+                lambda.getBody(),
+                symTabOf(val)
+        ));
     }
 
     @Override
@@ -51,4 +61,9 @@ public final class MapSequenceValue implements SequenceValue {
         return asString();
     }
     
+    private Map<String, Value> symTabOf(Value val) {
+        final Map<String, Value> symTab = new HashMap<>(1);
+        symTab.put(lambda.getParams().get(0), val);
+        return symTab;
+    }
 }

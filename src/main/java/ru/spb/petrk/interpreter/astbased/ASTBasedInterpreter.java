@@ -172,16 +172,16 @@ public final class ASTBasedInterpreter implements Interpreter {
         @Override
         public Value visitReduceOperator(ReduceOperator op) {
             SequenceValue seq = eval(SequenceValue.class, op.getSequence());
-            Value reduced = eval(op.getNeutralValue());
-            Map<String, Value> lambdaSymTab = new HashMap();
-            Iterator<Value> seqElems = seq.iterator();
-            while (seqElems.hasNext()) {
-                Value nextElem = seqElems.next();
-                lambdaSymTab.put(op.getLambda().getParams().get(0), reduced);
-                lambdaSymTab.put(op.getLambda().getParams().get(1), nextElem);
-                reduced = new ASTBasedInterpreter().interpret(op.getLambda().getBody(), lambdaSymTab);
-                lambdaSymTab.clear();
-            }
+            Value neutral = eval(op.getNeutralValue());
+            Value reduced = seq.stream().parallel().reduce(neutral, (left, right)-> {
+                Map<String, Value> lambdaSymTab = new HashMap(2);
+                lambdaSymTab.put(op.getLambda().getParams().get(0), left);
+                lambdaSymTab.put(op.getLambda().getParams().get(1), right);
+                return new ASTBasedInterpreter().interpret(
+                        op.getLambda().getBody(), 
+                        lambdaSymTab
+                );
+            });
             return reduced;
         }
 

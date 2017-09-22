@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.astbased.model;
 
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  *
@@ -15,6 +16,8 @@ public interface SequenceValue extends Value, Iterable<Value> {
 
     @Override
     Iterator<Value> iterator();
+    
+    Stream<Value> stream();
 
     default String asString() {
         boolean first = true;
