@@ -23,13 +23,17 @@ public class ShowInterpretationTask implements Runnable {
     
     public final String input;
     
-    public final JTextArea output;
+    // Modifications of a text in the output are made in the single 
+    // thread (InterpreterController's worker). Threrefore synchronization
+    // is not required
+    public final JTextArea output; 
     
     private volatile Future<?> taskFuture;
 
     public ShowInterpretationTask(JTextArea input, JTextArea output) {
         this.input = input.getText();
         this.output = output;
+        assert !output.isEditable() : "If output is editable, it must be properly synchronized!";
     }
     
     public void setTaskFuture(Future<?> taskFuture) {
