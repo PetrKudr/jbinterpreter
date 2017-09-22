@@ -16,6 +16,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -65,19 +67,35 @@ public class JInterpreter extends javax.swing.JFrame {
         
         // Set interpretation
         editorArea.getDocument().addDocumentListener(new DocumentListener() {
+            
+            private void onUpdate(DocumentEvent e) {
+                controller.post(new ShowInterpretationTask(editorArea, outputArea));
+            }
+            
             @Override
             public void insertUpdate(DocumentEvent e) {
-                controller.post(new ShowInterpretationTask(editorArea, outputArea));
+                onUpdate(e);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                controller.post(new ShowInterpretationTask(editorArea, outputArea));
+                onUpdate(e);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
                 // Do nothing
+            }
+        });
+        
+        editorArea.addCaretListener((CaretEvent e) -> {
+            try {
+                int caretPos = e.getDot();
+                int line = editorArea.getLineOfOffset(caretPos);
+                int column = caretPos - editorArea.getLineStartOffset(line);
+                editorPositionLabel.setText(String.format("%d:%d", line + 1, column + 1));
+            } catch (BadLocationException ex) {
+                editorPositionLabel.setText("bad location");
             }
         });
     }
@@ -96,6 +114,8 @@ public class JInterpreter extends javax.swing.JFrame {
         editorArea = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         outputArea = new javax.swing.JTextArea();
+        statusBarPanel = new javax.swing.JPanel();
+        editorPositionLabel = new javax.swing.JLabel();
         mainMenuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         miExit = new javax.swing.JMenuItem();
@@ -123,6 +143,23 @@ public class JInterpreter extends javax.swing.JFrame {
         jScrollPane4.setViewportView(outputArea);
 
         jSplitPane1.setRightComponent(jScrollPane4);
+
+        statusBarPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        editorPositionLabel.setText("1:1");
+
+        javax.swing.GroupLayout statusBarPanelLayout = new javax.swing.GroupLayout(statusBarPanel);
+        statusBarPanel.setLayout(statusBarPanelLayout);
+        statusBarPanelLayout.setHorizontalGroup(
+            statusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, statusBarPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(editorPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        statusBarPanelLayout.setVerticalGroup(
+            statusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(editorPositionLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+        );
 
         menuFile.setText("File");
 
@@ -158,13 +195,15 @@ public class JInterpreter extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 856, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(statusBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusBarPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -221,6 +260,7 @@ public class JInterpreter extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea editorArea;
+    private javax.swing.JLabel editorPositionLabel;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
@@ -230,5 +270,6 @@ public class JInterpreter extends javax.swing.JFrame {
     private javax.swing.JMenuItem miExit;
     private javax.swing.JMenuItem miPi;
     private javax.swing.JTextArea outputArea;
+    private javax.swing.JPanel statusBarPanel;
     // End of variables declaration//GEN-END:variables
 }
