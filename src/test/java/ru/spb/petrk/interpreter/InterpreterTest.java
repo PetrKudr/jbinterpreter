@@ -64,7 +64,11 @@ public class InterpreterTest extends TestCase {
                         "print \"Sum(\" \n" +
                         "out seqOfSeq\n" +
                         "print \") = \"\n" +
-                        "out reduce(seqOfSeq, 0, l r -> l + reduce(r, 0, l r -> l + r))"
+                        "var seqOfSum = reduce(seqOfSeq, {0, 0}, lSeq rSeq -> {\n" +
+                        "  reduce(lSeq, 0, l r -> l + r) + reduce(rSeq, 0, l r -> l + r),\n" +
+                        "  reduce(lSeq, 0, l r -> l + r) + reduce(rSeq, 0, l r -> l + r)\n" +
+                        "})\n" +
+                        "out reduce(seqOfSum, 0, l r -> l + r)"
                 )
         );
     }
