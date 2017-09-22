@@ -116,9 +116,10 @@ public class JInterpreter extends javax.swing.JFrame {
         jSplitPane1.setLeftComponent(jScrollPane3);
 
         outputArea.setEditable(false);
+        outputArea.setBackground(new java.awt.Color(206, 196, 187));
         outputArea.setColumns(20);
+        outputArea.setForeground(new java.awt.Color(40, 40, 40));
         outputArea.setRows(5);
-        outputArea.setEnabled(false);
         jScrollPane4.setViewportView(outputArea);
 
         jSplitPane1.setRightComponent(jScrollPane4);
