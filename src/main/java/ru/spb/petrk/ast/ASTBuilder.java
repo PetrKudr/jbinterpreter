@@ -186,11 +186,19 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
         if (ctx.INTEGER_NUMBER() != null) {
-            return new IntegerLiteralImpl(
-                    Integer.parseInt(ctx.INTEGER_NUMBER().getSymbol().getText()),
-                    line,
-                    column
-            );
+            try {
+                return new IntegerLiteralImpl(
+                        Integer.parseInt(ctx.INTEGER_NUMBER().getText()),
+                        line,
+                        column
+                );
+            } catch (NumberFormatException ex) {
+                throw new NumberFormatException(
+                        ASTUtils.position(line, column) + "number \"" 
+                                + ctx.INTEGER_NUMBER().getText() 
+                                + "\" is too big"
+                );
+            }
         }
         assert ctx.DOUBLE_NUMBER() != null;
         return new FloatingLiteralImpl(
