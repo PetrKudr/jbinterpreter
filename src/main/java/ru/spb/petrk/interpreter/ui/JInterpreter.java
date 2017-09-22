@@ -111,6 +111,8 @@ public class JInterpreter extends javax.swing.JFrame {
                 editorPositionLabel.setText("bad location");
             }
         });
+        
+        editorArea.setText("print \"Hello, World!\"");
     }
 
     /**
