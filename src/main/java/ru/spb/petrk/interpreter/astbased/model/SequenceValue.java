@@ -11,13 +11,14 @@ import java.util.Iterator;
  *
  * @author petrk
  */
-public interface SequenceValue extends Value {
+public interface SequenceValue extends Value, Iterable<Value> {
 
-    Iterator<Value> values();
+    @Override
+    Iterator<Value> iterator();
 
     default String asString() {
         boolean first = true;
-        Iterator<Value> valsIter = values();
+        Iterator<Value> valsIter = iterator();
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         while (valsIter.hasNext()) {

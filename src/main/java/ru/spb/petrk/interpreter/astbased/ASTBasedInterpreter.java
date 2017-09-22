@@ -174,7 +174,7 @@ public final class ASTBasedInterpreter implements Interpreter {
             SequenceValue seq = eval(SequenceValue.class, op.getSequence());
             Value reduced = eval(op.getNeutralValue());
             Map<String, Value> lambdaSymTab = new HashMap();
-            Iterator<Value> seqElems = seq.values();
+            Iterator<Value> seqElems = seq.iterator();
             while (seqElems.hasNext()) {
                 Value nextElem = seqElems.next();
                 lambdaSymTab.put(op.getLambda().getParams().get(0), reduced);

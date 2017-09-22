@@ -26,7 +26,7 @@ public final class IntSequenceValue implements SequenceValue {
     }
 
     @Override
-    public Iterator<Value> values() {
+    public Iterator<Value> iterator() {
         final int from = left.value();
         final int to = right.value();
         return new Iterator<Value>() {

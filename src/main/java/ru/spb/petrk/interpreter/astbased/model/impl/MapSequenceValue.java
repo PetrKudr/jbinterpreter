@@ -29,8 +29,8 @@ public final class MapSequenceValue implements SequenceValue {
     }
 
     @Override
-    public Iterator<Value> values() {
-        final Iterator<Value> orig = sequence.values();
+    public Iterator<Value> iterator() {
+        final Iterator<Value> orig = sequence.iterator();
         return new Iterator<Value>() {
             @Override
             public boolean hasNext() {
