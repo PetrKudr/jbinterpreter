@@ -75,7 +75,7 @@ public class InterpreterTest extends TestCase {
     
     @Test
     public void testCalcPi() throws Exception {
-        String golden = "pi = 3.143588659585789";
+        String golden = "pi = 3.1435886595857";
         String interpreted = interpret(
                 "var n = 500\n" +
                 "var sequence = map({0, n}, i -> (-1)^i / (2.0 * i + 1))\n" +
@@ -83,13 +83,8 @@ public class InterpreterTest extends TestCase {
                 "print \"pi = \"\n" +
                 "out pi"
         );
-        int minLength = Math.min(golden.length(), interpreted.length());
-        // Throw away last digit, because it may vary depending on order
-        // of reduce operation (assuming, that it is associative)
-        assertEquals(
-                golden.substring(0, minLength - 1),
-                interpreted.substring(0, minLength - 1)
-        );
+        assertTrue(interpreted.length() >= golden.length());
+        assertTrue(interpreted.startsWith(golden));
     }
     
     private String interpret(String input) {
