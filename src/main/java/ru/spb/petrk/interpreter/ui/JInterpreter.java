@@ -9,11 +9,20 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
+import java.util.stream.Stream;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -33,6 +42,10 @@ public class JInterpreter extends javax.swing.JFrame {
     private final InterpreterController controller = new InterpreterController();
     
     private final UndoManager editorUndoManager = new UndoManager();
+    
+    private final JFileChooser fileChooser = new JFileChooser();
+    
+    private File openedFile = null;
     
     /**
      * Creates new form JInterpreter
@@ -118,6 +131,10 @@ public class JInterpreter extends javax.swing.JFrame {
         editorPositionLabel = new javax.swing.JLabel();
         mainMenuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
+        miOpenFile = new javax.swing.JMenuItem();
+        miSaveFile = new javax.swing.JMenuItem();
+        miSaveFileAs = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         miExit = new javax.swing.JMenuItem();
         menuExamples = new javax.swing.JMenu();
         miPi = new javax.swing.JMenuItem();
@@ -162,6 +179,31 @@ public class JInterpreter extends javax.swing.JFrame {
         );
 
         menuFile.setText("File");
+
+        miOpenFile.setText("Open File...");
+        miOpenFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miOpenFileActionPerformed(evt);
+            }
+        });
+        menuFile.add(miOpenFile);
+
+        miSaveFile.setText("Save");
+        miSaveFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miSaveFileActionPerformed(evt);
+            }
+        });
+        menuFile.add(miSaveFile);
+
+        miSaveFileAs.setText("Save As...");
+        miSaveFileAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miSaveFileAsActionPerformed(evt);
+            }
+        });
+        menuFile.add(miSaveFileAs);
+        menuFile.add(jSeparator1);
 
         miExit.setText("Exit");
         miExit.addActionListener(new java.awt.event.ActionListener() {
@@ -223,6 +265,63 @@ public class JInterpreter extends javax.swing.JFrame {
         );
     }//GEN-LAST:event_miPiActionPerformed
 
+    private void miOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miOpenFileActionPerformed
+        int retVal = fileChooser.showOpenDialog(this);
+        if (retVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            if (file.exists()) {
+                File oldOpenedFile = openedFile;
+                String oldText = editorArea.getText();
+                editorArea.setText("");
+                openedFile = file;
+                try {
+                    Files.lines(file.toPath()).forEach(line -> {
+                        editorArea.append(line);
+                        editorArea.append("\n");
+                    });
+                } catch (IOException ex) {
+                    openedFile = oldOpenedFile;
+                    editorArea.setText(oldText);
+                    JOptionPane.showMessageDialog(this, "Failed to open file: " + ex.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "File " + file + " doesn't exist");
+            }
+        }
+    }//GEN-LAST:event_miOpenFileActionPerformed
+
+    private void miSaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveFileActionPerformed
+        if (openedFile == null) {
+            miSaveFileAsActionPerformed(evt);
+        } else {
+            saveFile(openedFile);
+        }
+    }//GEN-LAST:event_miSaveFileActionPerformed
+
+    private void miSaveFileAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveFileAsActionPerformed
+        int retVal = fileChooser.showSaveDialog(this);
+        if (retVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            saveFile(file);
+        }
+    }//GEN-LAST:event_miSaveFileAsActionPerformed
+
+    private void saveFile(File toFile) {
+        File oldOpenedFile = openedFile;
+        openedFile = toFile;
+        try {
+            Files.write(
+                    toFile.toPath(),
+                    editorArea.getText().getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.CREATE
+            );
+        } catch (IOException ex) {
+            openedFile = oldOpenedFile;
+            JOptionPane.showMessageDialog(this, "Failed to save file: " + ex.getMessage());
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -263,12 +362,16 @@ public class JInterpreter extends javax.swing.JFrame {
     private javax.swing.JLabel editorPositionLabel;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenuBar mainMenuBar;
     private javax.swing.JMenu menuExamples;
     private javax.swing.JMenu menuFile;
     private javax.swing.JMenuItem miExit;
+    private javax.swing.JMenuItem miOpenFile;
     private javax.swing.JMenuItem miPi;
+    private javax.swing.JMenuItem miSaveFile;
+    private javax.swing.JMenuItem miSaveFileAs;
     private javax.swing.JTextArea outputArea;
     private javax.swing.JPanel statusBarPanel;
     // End of variables declaration//GEN-END:variables
