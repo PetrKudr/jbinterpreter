@@ -202,10 +202,12 @@ public final class ASTBasedInterpreter implements Interpreter {
 
         @Override
         public Value visitSequenceExpr(SequenceExpr expr) {
-            return new IntSequenceValue(
-                    eval(IntValue.class, expr.getLHS()), 
-                    eval(IntValue.class, expr.getRHS())
-            );
+            IntValue left = eval(IntValue.class, expr.getLHS());
+            IntValue right = eval(IntValue.class, expr.getRHS());
+            if (left.value() > right.value()) {
+                return VoidValueImpl.INSTANCE; // not defined
+            }
+            return new IntSequenceValue(left, right);
         }
 
         @Override
