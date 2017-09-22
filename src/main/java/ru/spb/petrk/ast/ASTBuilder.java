@@ -61,17 +61,31 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     public VarDeclStmt visitVarStmt(JetBrainsLanguageParser.VarStmtContext ctx) {
         String name = ctx.IDENTIFIER().getText();
         Expr expr = visitAdditiveExpr(ctx.additiveExpr());
-        return new VarDeclStmtImpl(name, expr);
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
+        return new VarDeclStmtImpl(name, expr, line, column);
     }
 
     @Override
     public OutStmt visitOutStmt(JetBrainsLanguageParser.OutStmtContext ctx) {
-        return new OutStmtImpl(visitAdditiveExpr(ctx.additiveExpr()));
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
+        return new OutStmtImpl(visitAdditiveExpr(ctx.additiveExpr()), line, column);
     }
 
     @Override
     public PrintStmt visitPrintStmt(JetBrainsLanguageParser.PrintStmtContext ctx) {
-        return new PrintStmtImpl(new StringLiteralImpl(ctx.STRING().getText()));
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
+        return new PrintStmtImpl(
+                new StringLiteralImpl(
+                        ctx.STRING().getText(),
+                        ctx.STRING().getSymbol().getLine(),
+                        ctx.STRING().getSymbol().getCharPositionInLine()
+                ),
+                line,
+                column
+        );
     }
 
     @Override
@@ -133,7 +147,9 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     @Override
     public Expr visitUnaryExpr(JetBrainsLanguageParser.UnaryExprContext ctx) {
         if (ctx.MINUS() != null) {
-            return new UnaryOperatorImpl(true, visitAtom(ctx.atom()));
+            int line = ctx.getStart().getLine();
+            int column = ctx.getStart().getCharPositionInLine();
+            return new UnaryOperatorImpl(true, visitAtom(ctx.atom()), line, column);
         }
         return visitAtom(ctx.atom());
     }
@@ -152,7 +168,9 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             return visitReduceOperator(ctx.reduceOperator());
         }
         assert ctx.IDENTIFIER() != null;
-        return new RefExprImpl(ctx.IDENTIFIER().getSymbol().getText());
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
+        return new RefExprImpl(ctx.IDENTIFIER().getSymbol().getText(), line, column);
     }
 
     @Override
@@ -165,49 +183,71 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
 
     @Override
     public Expr visitNumber(JetBrainsLanguageParser.NumberContext ctx) {
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
         if (ctx.INTEGER_NUMBER() != null) {
-            return new IntegerLiteralImpl(Integer.parseInt(
-                    ctx.INTEGER_NUMBER().getSymbol().getText()
-            ));
+            return new IntegerLiteralImpl(
+                    Integer.parseInt(ctx.INTEGER_NUMBER().getSymbol().getText()),
+                    line,
+                    column
+            );
         }
         assert ctx.DOUBLE_NUMBER() != null;
-        return new FloatingLiteralImpl(Double.parseDouble(
-                ctx.DOUBLE_NUMBER().getSymbol().getText()
-        ));
+        return new FloatingLiteralImpl(
+                Double.parseDouble(ctx.DOUBLE_NUMBER().getSymbol().getText()),
+                line,
+                column
+        );
     }
 
     @Override
     public MapOperator visitMapOperator(JetBrainsLanguageParser.MapOperatorContext ctx) {
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
         return new MapOperatorImpl(
                 visitAdditiveExpr(ctx.additiveExpr()), 
-                visitMapLambda(ctx.mapLambda())
+                visitMapLambda(ctx.mapLambda()),
+                line,
+                column
         );
     }
     
     @Override
     public ReduceOperator visitReduceOperator(JetBrainsLanguageParser.ReduceOperatorContext ctx) {
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
         return new ReduceOperatorImpl(
                 visitAdditiveExpr(ctx.additiveExpr(0)), 
                 visitAdditiveExpr(ctx.additiveExpr(1)),
-                visitReduceLambda(ctx.reduceLambda())
+                visitReduceLambda(ctx.reduceLambda()),
+                line,
+                column
         );
     }
 
     @Override
     public LambdaExpr visitMapLambda(JetBrainsLanguageParser.MapLambdaContext ctx) {
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
         return new LambdaExprImpl(
                 Arrays.asList(ctx.IDENTIFIER().getSymbol().getText()), 
-                visitAdditiveExpr(ctx.additiveExpr())
+                visitAdditiveExpr(ctx.additiveExpr()),
+                line,
+                column
         );
     }
 
     @Override
     public LambdaExpr visitReduceLambda(JetBrainsLanguageParser.ReduceLambdaContext ctx) {
+        int line = ctx.getStart().getLine();
+        int column = ctx.getStart().getCharPositionInLine();
         return new LambdaExprImpl(
                 ctx.IDENTIFIER().stream()
                         .map(id -> id.getSymbol().getText())
                         .collect(Collectors.toList()), 
-                visitAdditiveExpr(ctx.additiveExpr())
+                visitAdditiveExpr(ctx.additiveExpr()),
+                line,
+                column
         );
     }
 }

@@ -16,13 +16,14 @@ import ru.spb.petrk.ast.LambdaExpr;
  *
  * @author petrk
  */
-public class LambdaExprImpl implements LambdaExpr {
+public class LambdaExprImpl extends OffsetableAST implements LambdaExpr {
     
     private final List<String> parameters;
     
-    private Expr body;
+    private final Expr body;
 
-    public LambdaExprImpl(List<String> parameters, Expr body) {
+    public LambdaExprImpl(List<String> parameters, Expr body, int line, int column) {
+        super(line, column);
         this.parameters = Collections.unmodifiableList(parameters);
         this.body = body;
     }

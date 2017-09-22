@@ -48,4 +48,14 @@ public class BinaryOperatorImpl implements BinaryOperator {
     public List<AST> getChildren() {
         return Arrays.asList(LHS, RHS);
     }
+
+    @Override
+    public int getLine() {
+        return LHS.getLine();
+    }
+
+    @Override
+    public int getColumn() {
+        return LHS.getColumn();
+    }
 }

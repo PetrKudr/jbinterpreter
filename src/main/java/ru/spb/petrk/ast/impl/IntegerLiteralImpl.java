@@ -14,11 +14,12 @@ import ru.spb.petrk.ast.IntegerLiteral;
  *
  * @author petrk
  */
-public class IntegerLiteralImpl implements IntegerLiteral {
+public class IntegerLiteralImpl extends OffsetableAST implements IntegerLiteral {
     
     private final int value;
 
-    public IntegerLiteralImpl(int value) {
+    public IntegerLiteralImpl(int value, int line, int column) {
+        super(line, column);
         this.value = value;
     }
 

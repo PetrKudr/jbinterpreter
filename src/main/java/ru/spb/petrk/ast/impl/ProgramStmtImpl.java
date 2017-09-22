@@ -32,4 +32,14 @@ public class ProgramStmtImpl implements ProgramStmt {
     public List<Stmt> getChildren() {
         return statements;
     }
+
+    @Override
+    public int getLine() {
+        return statements.isEmpty() ? 0 : statements.get(0).getLine();
+    }
+
+    @Override
+    public int getColumn() {
+        return statements.isEmpty() ? 0 : statements.get(0).getColumn();
+    }
 }

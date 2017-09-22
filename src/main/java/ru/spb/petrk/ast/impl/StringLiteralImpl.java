@@ -15,11 +15,12 @@ import ru.spb.petrk.ast.StringLiteral;
  *
  * @author petrk
  */
-public class StringLiteralImpl implements StringLiteral {
+public class StringLiteralImpl extends OffsetableAST implements StringLiteral {
     
     private final String string;
 
-    public StringLiteralImpl(String string) {
+    public StringLiteralImpl(String string, int line, int column) {
+        super(line, column);
         this.string = string;
     }
 

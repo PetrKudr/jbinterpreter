@@ -16,11 +16,12 @@ import ru.spb.petrk.ast.Stmt;
  *
  * @author petrk
  */
-public class OutStmtImpl implements OutStmt {
+public class OutStmtImpl extends OffsetableAST implements OutStmt {
     
     private final Expr expr;
 
-    public OutStmtImpl(Expr expr) {
+    public OutStmtImpl(Expr expr, int line, int column) {
+        super(line, column);
         this.expr = expr;
     }
 

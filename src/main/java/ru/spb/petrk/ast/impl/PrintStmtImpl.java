@@ -16,11 +16,12 @@ import ru.spb.petrk.ast.StringLiteral;
  *
  * @author petrk
  */
-public class PrintStmtImpl implements PrintStmt {
+public class PrintStmtImpl extends OffsetableAST implements PrintStmt {
     
     private final StringLiteral message;
 
-    public PrintStmtImpl(StringLiteral message) {
+    public PrintStmtImpl(StringLiteral message, int line, int column) {
+        super(line, column);
         this.message = message;
     }
 

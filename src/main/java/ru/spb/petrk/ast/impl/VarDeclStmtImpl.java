@@ -16,13 +16,14 @@ import ru.spb.petrk.ast.VarDeclStmt;
  *
  * @author petrk
  */
-public class VarDeclStmtImpl implements VarDeclStmt {
+public class VarDeclStmtImpl extends OffsetableAST implements VarDeclStmt {
     
     private final String name;
     
     private final Expr initializer;
 
-    public VarDeclStmtImpl(String name, Expr initializer) {
+    public VarDeclStmtImpl(String name, Expr initializer, int line, int column) {
+        super(line, column);
         this.name = name;
         this.initializer = initializer;
     }

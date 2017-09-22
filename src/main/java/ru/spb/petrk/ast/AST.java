@@ -15,4 +15,8 @@ import java.util.List;
 public interface AST {
     
     List<? extends AST> getChildren();
+    
+    public int getLine();
+    
+    public int getColumn();
 }

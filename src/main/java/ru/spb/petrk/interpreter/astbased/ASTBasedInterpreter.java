@@ -108,7 +108,8 @@ public final class ASTBasedInterpreter implements Interpreter {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
                 throw new InterpreterException(
-                        "Mismatched types: expected \"" + getValueType(cls) + "\"," 
+                        position(expr) + "mismatched types: " 
+                                + "expected \"" + getValueType(cls) + "\"," 
                                 + " but found \"" + getValueType(val.getClass()) + "\""
                 );
             }
@@ -211,7 +212,7 @@ public final class ASTBasedInterpreter implements Interpreter {
             Value val = symTab.get(expr.getName());
             if (val == null) {
                 throw new InterpreterException(
-                        "Unresolved variable: \"" + expr.getName() + "\""
+                        position(expr) + "unresolved variable: \"" + expr.getName() + "\""
                 );
             }
             return val;
@@ -278,6 +279,10 @@ public final class ASTBasedInterpreter implements Interpreter {
                 return "Void";
             }
             return "Unexpected value type!";
+        }
+        
+        private static String position(AST ast) {
+            return "line " + ast.getLine() + ":" + (ast.getColumn() + 1) + " ";
         }
     }
 }

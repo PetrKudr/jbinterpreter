@@ -16,13 +16,14 @@ import ru.spb.petrk.ast.UnaryOperator;
  *
  * @author petrk
  */
-public class UnaryOperatorImpl implements UnaryOperator {
+public class UnaryOperatorImpl extends OffsetableAST implements UnaryOperator {
     
     private final boolean minus;
     
     private final Expr expr;
 
-    public UnaryOperatorImpl(boolean minus, Expr expr) {
+    public UnaryOperatorImpl(boolean minus, Expr expr, int line, int column) {
+        super(line, column);
         this.minus = minus;
         this.expr = expr;
     }

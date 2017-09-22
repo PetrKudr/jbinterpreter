@@ -18,7 +18,7 @@ import ru.spb.petrk.ast.Stmt;
  *
  * @author petrk
  */
-public class ReduceOperatorImpl implements ReduceOperator {
+public class ReduceOperatorImpl extends OffsetableAST implements ReduceOperator {
     
     private final Expr sequence;
     
@@ -26,7 +26,11 @@ public class ReduceOperatorImpl implements ReduceOperator {
     
     private final LambdaExpr lambda;
 
-    public ReduceOperatorImpl(Expr sequence, Expr neutralValue, LambdaExpr lambda) {
+    public ReduceOperatorImpl(
+            Expr sequence, Expr neutralValue, LambdaExpr lambda, 
+            int line, int column
+    ) {
+        super(line, column);
         this.sequence = sequence;
         this.neutralValue = neutralValue;
         this.lambda = lambda;
