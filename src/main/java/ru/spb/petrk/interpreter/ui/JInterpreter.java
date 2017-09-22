@@ -138,6 +138,7 @@ public class JInterpreter extends javax.swing.JFrame {
         miExit = new javax.swing.JMenuItem();
         menuExamples = new javax.swing.JMenu();
         miPi = new javax.swing.JMenuItem();
+        miSeqOfSeq = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -225,6 +226,14 @@ public class JInterpreter extends javax.swing.JFrame {
         });
         menuExamples.add(miPi);
 
+        miSeqOfSeq.setText("Sequence of sequences");
+        miSeqOfSeq.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miSeqOfSeqActionPerformed(evt);
+            }
+        });
+        menuExamples.add(miSeqOfSeq);
+
         mainMenuBar.add(menuExamples);
 
         setJMenuBar(mainMenuBar);
@@ -306,6 +315,20 @@ public class JInterpreter extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_miSaveFileAsActionPerformed
 
+    private void miSeqOfSeqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSeqOfSeqActionPerformed
+        editorArea.setText(
+                "var seqOfSeq = map({1, 3}, val->{1, val})\n" +
+                "print \"Sum(\" \n" +
+                "out seqOfSeq\n" +
+                "print \") = \"\n" +
+                "var seqOfSum = reduce(seqOfSeq, {0, 0}, lSeq rSeq -> {\n" +
+                "  reduce(lSeq, 0, l r -> l + r) + reduce(rSeq, 0, l r -> l + r),\n" +
+                "  reduce(lSeq, 0, l r -> l + r) + reduce(rSeq, 0, l r -> l + r)\n" +
+                "})\n" +
+                "out reduce(seqOfSum, 0, l r -> l + r)"
+        );
+    }//GEN-LAST:event_miSeqOfSeqActionPerformed
+
     private void saveFile(File toFile) {
         File oldOpenedFile = openedFile;
         openedFile = toFile;
@@ -372,6 +395,7 @@ public class JInterpreter extends javax.swing.JFrame {
     private javax.swing.JMenuItem miPi;
     private javax.swing.JMenuItem miSaveFile;
     private javax.swing.JMenuItem miSaveFileAs;
+    private javax.swing.JMenuItem miSeqOfSeq;
     private javax.swing.JTextArea outputArea;
     private javax.swing.JPanel statusBarPanel;
     // End of variables declaration//GEN-END:variables
