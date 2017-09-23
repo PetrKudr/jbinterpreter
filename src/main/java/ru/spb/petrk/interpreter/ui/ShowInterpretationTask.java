@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.text.JTextComponent;
 import ru.spb.petrk.interpreter.Interpreter;
 import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 
@@ -30,7 +31,7 @@ public class ShowInterpretationTask implements Runnable {
     
     private volatile Future<?> taskFuture;
 
-    public ShowInterpretationTask(JTextArea input, JTextArea output) {
+    public ShowInterpretationTask(JTextComponent input, JTextArea output) {
         this.input = input.getText();
         this.output = output;
         assert !output.isEditable() : "If output is editable, it must be properly synchronized!";

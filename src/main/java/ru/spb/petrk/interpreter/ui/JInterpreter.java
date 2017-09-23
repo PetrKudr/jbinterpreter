@@ -23,6 +23,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -30,6 +31,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Utilities;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
@@ -54,9 +56,9 @@ public class JInterpreter extends javax.swing.JFrame {
         initComponents();
         
         // Set undo/redo
-        editorArea.getDocument().addUndoableEditListener(editorUndoManager);
-        InputMap im = editorArea.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap am = editorArea.getActionMap();
+        editorPane.getDocument().addUndoableEditListener(editorUndoManager);
+        InputMap im = editorPane.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap am = editorPane.getActionMap();
 
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Undo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Redo");
@@ -79,10 +81,10 @@ public class JInterpreter extends javax.swing.JFrame {
         });
         
         // Set interpretation
-        editorArea.getDocument().addDocumentListener(new DocumentListener() {
+        editorPane.getDocument().addDocumentListener(new DocumentListener() {
             
             private void onUpdate(DocumentEvent e) {
-                controller.post(new ShowInterpretationTask(editorArea, outputArea));
+                controller.post(new ShowInterpretationTask(editorPane, outputArea));
             }
             
             @Override
@@ -101,18 +103,24 @@ public class JInterpreter extends javax.swing.JFrame {
             }
         });
         
-        editorArea.addCaretListener((CaretEvent e) -> {
+        editorPane.addCaretListener((CaretEvent e) -> {
             try {
                 int caretPos = e.getDot();
-                int line = editorArea.getLineOfOffset(caretPos);
-                int column = caretPos - editorArea.getLineStartOffset(line);
+                int line = getLineOfOffset(editorPane, caretPos);
+                int column = caretPos - Utilities.getRowStart(editorPane, caretPos);
                 editorPositionLabel.setText(String.format("%d:%d", line + 1, column + 1));
             } catch (BadLocationException ex) {
                 editorPositionLabel.setText("bad location");
             }
         });
         
-        editorArea.setText("print \"Hello, World!\"");
+        editorPane.setText("print \"Hello, World!\"");
+    }
+    
+    private static int getLineOfOffset(JTextPane pane, int offset) {
+        return pane.getDocument()
+                .getDefaultRootElement()
+                .getElementIndex(offset) + 1;
     }
 
     /**
@@ -125,8 +133,8 @@ public class JInterpreter extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        editorArea = new javax.swing.JTextArea();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        editorPane = new javax.swing.JTextPane();
         jScrollPane4 = new javax.swing.JScrollPane();
         outputArea = new javax.swing.JTextArea();
         statusBarPanel = new javax.swing.JPanel();
@@ -148,12 +156,10 @@ public class JInterpreter extends javax.swing.JFrame {
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setPreferredSize(new java.awt.Dimension(58, 8));
 
-        editorArea.setColumns(20);
-        editorArea.setFont(new java.awt.Font("Courier 10 Pitch", 0, 15)); // NOI18N
-        editorArea.setRows(5);
-        jScrollPane3.setViewportView(editorArea);
+        editorPane.setFont(new java.awt.Font("Courier New", 0, 15)); // NOI18N
+        jScrollPane1.setViewportView(editorPane);
 
-        jSplitPane1.setLeftComponent(jScrollPane3);
+        jSplitPane1.setLeftComponent(jScrollPane1);
 
         outputArea.setEditable(false);
         outputArea.setBackground(new java.awt.Color(206, 196, 187));
@@ -267,7 +273,7 @@ public class JInterpreter extends javax.swing.JFrame {
     }//GEN-LAST:event_miExitActionPerformed
 
     private void miPiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPiActionPerformed
-        editorArea.setText(
+        editorPane.setText(
                 "var n = 500\n" + 
                 "var sequence = map({0, n}, i -> (-1)^i / (2.0 * i + 1))\n" + 
                 "var pi = 4 * reduce(sequence, 0, x y -> x + y)\n" +
@@ -282,17 +288,24 @@ public class JInterpreter extends javax.swing.JFrame {
             File file = fileChooser.getSelectedFile();
             if (file.exists()) {
                 File oldOpenedFile = openedFile;
-                String oldText = editorArea.getText();
-                editorArea.setText("");
+                String oldText = editorPane.getText();
+                editorPane.setText("");
                 openedFile = file;
                 try {
                     Files.lines(file.toPath()).forEach(line -> {
-                        editorArea.append(line);
-                        editorArea.append("\n");
+                        try {
+                            editorPane.getDocument().insertString(
+                                    editorPane.getDocument().getLength(), 
+                                    line + "\n", 
+                                    null
+                            );
+                        } catch (BadLocationException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     });
-                } catch (IOException ex) {
+                } catch (Throwable ex) {
                     openedFile = oldOpenedFile;
-                    editorArea.setText(oldText);
+                    editorPane.setText(oldText);
                     JOptionPane.showMessageDialog(this, "Failed to open file: " + ex.getMessage());
                 }
             } else {
@@ -318,7 +331,7 @@ public class JInterpreter extends javax.swing.JFrame {
     }//GEN-LAST:event_miSaveFileAsActionPerformed
 
     private void miSeqOfSeqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSeqOfSeqActionPerformed
-        editorArea.setText(
+        editorPane.setText(
                 "var seqOfSeq = map({1, 3}, val->{1, val})\n" +
                 "print \"Sum(\" \n" +
                 "out seqOfSeq\n" +
@@ -337,7 +350,7 @@ public class JInterpreter extends javax.swing.JFrame {
         try {
             Files.write(
                     toFile.toPath(),
-                    editorArea.getText().getBytes(StandardCharsets.UTF_8),
+                    editorPane.getText().getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.CREATE
             );
@@ -383,9 +396,9 @@ public class JInterpreter extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea editorArea;
+    private javax.swing.JTextPane editorPane;
     private javax.swing.JLabel editorPositionLabel;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
