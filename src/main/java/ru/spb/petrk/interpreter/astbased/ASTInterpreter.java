@@ -221,6 +221,7 @@ public final class ASTInterpreter implements Interpreter {
 
         @Override
         public Value visitLambdaExpr(LambdaExpr expr) {
+            assert false : "Why interpreting lambda declaration?";
             return VoidValueImpl.INSTANCE;
         }
 
