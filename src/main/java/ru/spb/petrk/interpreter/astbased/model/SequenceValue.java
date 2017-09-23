@@ -13,9 +13,6 @@ import java.util.stream.Stream;
  * @author petrk
  */
 public interface SequenceValue extends Value, Iterable<Value> {
-
-    @Override
-    Iterator<Value> iterator();
     
     Stream<Value> stream();
 
