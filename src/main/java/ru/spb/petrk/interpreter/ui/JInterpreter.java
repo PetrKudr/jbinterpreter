@@ -107,7 +107,7 @@ public class JInterpreter extends javax.swing.JFrame {
             try {
                 int caretPos = e.getDot();
                 int line = getLineOfOffset(editorPane, caretPos);
-                int column = caretPos - Utilities.getRowStart(editorPane, caretPos);
+                int column = caretPos - getLineStartOffset(editorPane, caretPos);
                 editorPositionLabel.setText(String.format("%d:%d", line + 1, column + 1));
             } catch (BadLocationException ex) {
                 editorPositionLabel.setText("bad location");
@@ -121,6 +121,10 @@ public class JInterpreter extends javax.swing.JFrame {
         return pane.getDocument()
                 .getDefaultRootElement()
                 .getElementIndex(offset) + 1;
+    }
+    
+    private static int getLineStartOffset(JTextPane pane, int offset) throws BadLocationException {
+        return Utilities.getRowStart(pane, offset);
     }
 
     /**
