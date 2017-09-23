@@ -6,7 +6,7 @@
 package ru.spb.petrk.ast;
 
 /**
- * Represents an AST node with non-void type.
+ * Represents an AST node that corresponds to the expression rule in the language.
  * 
  * @author petrk
  */

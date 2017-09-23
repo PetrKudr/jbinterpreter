@@ -9,7 +9,7 @@ import java.util.List;
 
 
 /**
- * Represents an AST node with void type.
+ * Represents an AST node that corresponds to the statement rule in the language.
  * 
  * @author petrk
  */
