@@ -6,6 +6,7 @@
 package ru.spb.petrk.ast;
 
 /**
+ * Represents out statement.
  *
  * @author petrk
  */

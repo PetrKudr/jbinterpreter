@@ -6,6 +6,7 @@
 package ru.spb.petrk.ast;
 
 /**
+ * Represents integer constant.
  *
  * @author petrk
  */

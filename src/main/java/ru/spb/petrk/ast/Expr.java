@@ -6,7 +6,7 @@
 package ru.spb.petrk.ast;
 
 /**
- * Serves as a root for every AST node
+ * Represents an AST node with non-void type.
  * 
  * @author petrk
  */

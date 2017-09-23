@@ -8,7 +8,7 @@ package ru.spb.petrk.ast;
 import java.util.List;
 
 /**
- * Serves as root for any AST node
+ * Serves as a root for any AST node.
  *
  * @author petrk
  */

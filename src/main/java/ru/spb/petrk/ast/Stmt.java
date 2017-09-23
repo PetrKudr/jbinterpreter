@@ -9,6 +9,7 @@ import java.util.List;
 
 
 /**
+ * Represents an AST node with void type.
  * 
  * @author petrk
  */

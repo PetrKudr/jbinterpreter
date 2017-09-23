@@ -8,6 +8,7 @@ package ru.spb.petrk.ast;
 import java.util.List;
 
 /**
+ * Represents declaration of lambda.
  *
  * @author petrk
  */

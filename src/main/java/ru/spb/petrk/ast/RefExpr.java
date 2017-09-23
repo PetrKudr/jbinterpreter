@@ -6,6 +6,7 @@
 package ru.spb.petrk.ast;
 
 /**
+ * Represents reference to a variable.
  *
  * @author petrk
  */

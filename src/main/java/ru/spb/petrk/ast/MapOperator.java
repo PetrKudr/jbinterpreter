@@ -6,16 +6,21 @@
 package ru.spb.petrk.ast;
 
 /**
+ * Represents map operator.
  *
  * @author petrk
  */
 public interface MapOperator extends Expr {
     
+    /**
+     * @return original sequence
+     */
     Expr getSequence();
     
     /**
-     * (a) -> expr
-     * @return lambda
+     * Returns a function to apply to each element.
+     * 
+     * @return lambda of type (a) -> expr
      */
     LambdaExpr getLambda();
 }
