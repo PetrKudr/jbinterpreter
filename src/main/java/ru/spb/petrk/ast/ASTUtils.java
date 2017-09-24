@@ -186,7 +186,16 @@ public final class ASTUtils {
                         ex.getStartIndex(), 
                         line, 
                         charPositionInLine, 
-                        lexer.getCharIndex()
+                        lexer.getCharIndex() - ex.getStartIndex()
+                );
+            } else if (offendingSymbol instanceof Token) {
+                Token tok = (Token) offendingSymbol;
+                throw new SyntaxException(
+                        msg, 
+                        tok.getStartIndex(), 
+                        line, 
+                        charPositionInLine, 
+                        tok.getStopIndex() - tok.getStartIndex() + 1
                 );
             }
             // TODO: fix offset
