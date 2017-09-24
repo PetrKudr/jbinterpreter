@@ -115,7 +115,7 @@ public class ParserTest {
     }
     
     private String parse(String input) {
-        List<String> errors = new ArrayList<>();
+        List<ASTUtils.ParserError> errors = new ArrayList<>();
         ProgramStmt program = ASTUtils.parse(input, errors);
         if (program != null) {
             return ast2String(program);

@@ -11,17 +11,27 @@ import ru.spb.petrk.ast.AST;
  *
  * @author petrk
  */
-public abstract class OffsetableAST implements AST {
+public final class PositionImpl implements AST.Position {
+    
+    public static final PositionImpl EMPTY = new PositionImpl(0, 0, 0);
+    
+    private final int offset;
     
     private final int line;
-    
+
     private final int column;
 
-    public OffsetableAST(int line, int column) {
+    public PositionImpl(int offset, int line, int column) {
+        this.offset = offset;
         this.line = line;
         this.column = column;
     }
-    
+
+    @Override
+    public int getOffset() {
+        return offset;
+    }
+
     @Override
     public int getLine() {
         return line;

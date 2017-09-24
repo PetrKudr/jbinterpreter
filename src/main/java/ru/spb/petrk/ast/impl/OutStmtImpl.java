@@ -10,18 +10,17 @@ import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.OutStmt;
-import ru.spb.petrk.ast.Stmt;
 
 /**
  *
  * @author petrk
  */
-public class OutStmtImpl extends OffsetableAST implements OutStmt {
+public class OutStmtImpl extends LeftOffsetableASTBase implements OutStmt {
     
     private final Expr expr;
 
-    public OutStmtImpl(Expr expr, int line, int column) {
-        super(line, column);
+    public OutStmtImpl(Expr expr, Position left) {
+        super(left);
         this.expr = expr;
     }
 
@@ -33,5 +32,10 @@ public class OutStmtImpl extends OffsetableAST implements OutStmt {
     @Override
     public List<AST> getChildren() {
         return Arrays.asList(expr);
+    }
+
+    @Override
+    public Position getStop() {
+        return expr.getStop();
     }
 }

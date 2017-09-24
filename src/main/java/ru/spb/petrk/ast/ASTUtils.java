@@ -29,8 +29,8 @@ import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
  * @author toor
  */
 public final class ASTUtils {
-    
-    public static final ProgramStmt parse(String input, List<String> errors) {
+        
+    public static final ProgramStmt parse(String input, List<ParserError> errors) {
         assert errors.isEmpty();
         ParserErrorsListener errorsListener = new ParserErrorsListener();
         
@@ -53,29 +53,88 @@ public final class ASTUtils {
         try {
             ast = builder.visitProgram(parser.program());
         } catch (ParseCancellationException ex) {
-            if (ex.getMessage() != null) {
-                errors.add(ex.getMessage());
-            } else {
-                errors.add("Unrecognized parse error!");
-            }
+            errors.add(new ParserError(ex));
+            ast = null;
+        } catch (RecognitionException ex) {
+            errors.add(new ParserError(ex));
+            ast = null;
+        } catch (ASTBuilder.ASTBuildException ex) {
+            errors.add(ex.error);
             ast = null;
         } catch (RuntimeException ex) {
-            if (ex.getMessage() != null) {
-                errors.add(ex.getMessage());
-            } else {
-                errors.add("Unrecognized lex or parse error!");
-            }
+            errors.add(new ParserError());
             ast = null;
         }
         return ast;
     }
     
     public static String position(AST ast) {
-        return position(ast.getLine(), ast.getColumn());
+        return position(ast.getStart().getLine(), ast.getStart().getColumn());
     }
     
     public static String position(int line, int column) {
         return "line " + line + ":" + (column + 1) + " ";
+    }
+    
+    public static final class ParserError {
+        
+        public final String message;
+        
+        public final int offendingStartOffset;
+
+        public final int offendingStartLine;
+
+        public final int offendingStartColumn;
+
+        public final int offendingLength;
+        
+        /*package*/ ParserError() {
+            this.message = "Unrecognized parse or lex error!";
+            this.offendingStartOffset = -1;
+            this.offendingStartLine = -1;
+            this.offendingStartColumn = -1;
+            this.offendingLength = -1;
+        }
+
+        /*package*/ ParserError(String message, int offendingStartOffset, int offendingStartLine, int offendingStartColumn, int offendingLength) {
+            this.message = message;
+            this.offendingStartOffset = offendingStartOffset;
+            this.offendingStartLine = offendingStartLine;
+            this.offendingStartColumn = offendingStartColumn;
+            this.offendingLength = offendingLength;
+        }
+        
+        /*package*/ ParserError(RecognitionException ex) {
+            Token offendingToken = ex.getOffendingToken();
+            this.message = ex.getMessage();
+            this.offendingStartOffset = offendingToken.getStartIndex();
+            this.offendingStartLine = offendingToken.getLine();
+            this.offendingStartColumn = offendingToken.getCharPositionInLine();
+            this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex();
+        }
+        
+        /*package*/ ParserError(ParseCancellationException ex) {
+            if (ex.getCause() instanceof RecognitionException) {
+                this.message = ex.getMessage();
+                RecognitionException re = (RecognitionException) ex.getCause();
+                Token offendingToken = re.getOffendingToken();
+                this.offendingStartOffset = offendingToken.getStartIndex();
+                this.offendingStartLine = offendingToken.getLine();
+                this.offendingStartColumn = offendingToken.getCharPositionInLine();
+                this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex();
+            } else {
+                this.message = "Unrecognized parse or lex error!";
+                this.offendingStartOffset = -1;
+                this.offendingStartLine = -1;
+                this.offendingStartColumn = -1;
+                this.offendingLength = -1;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return position(offendingStartLine, offendingStartColumn) + message; 
+        }
     }
     
     private static final class ParserErrorsListener extends BaseErrorListener {
@@ -84,10 +143,7 @@ public final class ASTUtils {
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                 int line, int charPositionInLine,
                 String msg, RecognitionException e) {
-            throw new ParseCancellationException(
-                    position(line, charPositionInLine) + msg, 
-                    e
-            );
+            throw new ParseCancellationException(msg, e);
         }
     }
     
@@ -102,8 +158,7 @@ public final class ASTUtils {
         @Override
         public void reportInputMismatch(Parser recognizer, InputMismatchException e) throws RecognitionException {
             Token tok = e.getOffendingToken();
-            String msg = position(tok.getLine(), tok.getCharPositionInLine()) + 
-                    "mismatched input " 
+            String msg = "mismatched input " 
                     + getTokenErrorDisplay(tok) 
                     + " expecting one of " 
                     + e.getExpectedTokens().toString(recognizer.getVocabulary());
@@ -122,10 +177,14 @@ public final class ASTUtils {
             beginErrorCondition(recognizer);
             Token tok = recognizer.getCurrentToken();
             IntervalSet expecting = getExpectedTokens(recognizer);
-            String msg = position(tok.getLine(), tok.getCharPositionInLine()) 
-                    + "missing " + expecting.toString(recognizer.getVocabulary()) 
+            String msg = "missing " + expecting.toString(recognizer.getVocabulary()) 
                     + " at " + getTokenErrorDisplay(tok);
-            throw new RecognitionException(msg, recognizer, recognizer.getInputStream(), recognizer.getContext());
+            throw new RecognitionException(
+                    msg, 
+                    recognizer, 
+                    recognizer.getInputStream(), 
+                    recognizer.getContext()
+            );
         }
     }
 }

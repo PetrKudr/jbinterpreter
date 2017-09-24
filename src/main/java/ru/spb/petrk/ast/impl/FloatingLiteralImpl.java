@@ -14,12 +14,12 @@ import ru.spb.petrk.ast.FloatingLiteral;
  *
  * @author petrk
  */
-public class FloatingLiteralImpl extends OffsetableAST implements FloatingLiteral {
+public class FloatingLiteralImpl extends LeftRightOffsetableASTBase implements FloatingLiteral {
     
     private final double value;
 
-    public FloatingLiteralImpl(double value, int line, int column) {
-        super(line, column);
+    public FloatingLiteralImpl(double value, Position left, Position right) {
+        super(left, right);
         this.value = value;
     }
 

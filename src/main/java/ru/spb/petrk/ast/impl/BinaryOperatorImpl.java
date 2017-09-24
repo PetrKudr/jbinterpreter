@@ -50,12 +50,12 @@ public class BinaryOperatorImpl implements BinaryOperator {
     }
 
     @Override
-    public int getLine() {
-        return LHS.getLine();
+    public Position getStart() {
+        return LHS.getStart();
     }
 
     @Override
-    public int getColumn() {
-        return LHS.getColumn();
+    public Position getStop() {
+        return RHS.getStop();
     }
 }

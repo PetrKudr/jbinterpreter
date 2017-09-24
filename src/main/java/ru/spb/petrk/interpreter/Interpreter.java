@@ -22,4 +22,13 @@ public interface Interpreter {
      * @return true if no errors occured, false otherwise
      */
     boolean interpret(String input, PrintStream out, PrintStream err);
+    
+    /**
+     * Interprets input
+     * 
+     * @param input - code
+     * @param listener
+     * @return true if no errors occured, false otherwise
+     */
+    boolean interpret(String input, InterpreterListener listener);
 }

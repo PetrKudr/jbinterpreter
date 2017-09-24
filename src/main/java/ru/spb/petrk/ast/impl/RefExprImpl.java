@@ -15,12 +15,12 @@ import ru.spb.petrk.ast.Stmt;
  *
  * @author petrk
  */
-public class RefExprImpl extends OffsetableAST implements RefExpr {
+public class RefExprImpl extends LeftRightOffsetableASTBase implements RefExpr {
     
     private final String name;
 
-    public RefExprImpl(String name, int line, int column) {
-        super(line, column);
+    public RefExprImpl(String name, Position left, Position right) {
+        super(left, right);
         this.name = name;
     }
 

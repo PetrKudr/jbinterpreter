@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ASTUtils;
+import ru.spb.petrk.ast.ASTUtils.ParserError;
 import static ru.spb.petrk.ast.ASTUtils.position;
 import ru.spb.petrk.ast.ASTVisitor;
 import ru.spb.petrk.ast.BinaryOperator;
@@ -35,7 +36,9 @@ import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.StringLiteral;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
+import ru.spb.petrk.interpreter.InterpreterError;
 import ru.spb.petrk.interpreter.Interpreter;
+import ru.spb.petrk.interpreter.InterpreterListener;
 import ru.spb.petrk.interpreter.astbased.model.FloatingValue;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
 import ru.spb.petrk.interpreter.astbased.model.NumberValue;
@@ -52,22 +55,39 @@ import ru.spb.petrk.interpreter.astbased.model.impl.VoidValueImpl;
 public final class ASTInterpreter implements Interpreter {
     
     @Override
-    public boolean interpret(String input, PrintStream out, PrintStream err) {
-        List<String> parseOrLexErrors = new ArrayList<>();
+    public boolean interpret(String input, final PrintStream out, final PrintStream err) {
+        return interpret(input, new InterpreterListener() {
+            @Override
+            public void onOut(String msg) {
+                out.print(msg);
+            }
+
+            @Override
+            public void onError(InterpreterError error) {
+                err.println(error.toString());
+            }
+        });
+    }
+    
+    @Override
+    public boolean interpret(String input, InterpreterListener listener) {
+        List<ASTUtils.ParserError> parseOrLexErrors = new ArrayList<>();
         ProgramStmt program = ASTUtils.parse(input, parseOrLexErrors);
         if (program == null) {
-            parseOrLexErrors.stream().forEach(error -> err.println(error));
+            parseOrLexErrors.stream()
+                    .map(parseError -> toInterpretError(parseError))
+                    .forEach(interpretError -> listener.onError(interpretError));
             return false;
         }
         try {
-            interpret(program, new HashMap<>(), out);
+            interpret(program, new HashMap<>(), listener);
             return true;
         } catch (ASTInterruptedInterpreterException ex) {
             // Just return
             return false;
         } catch (ASTInterpreterException ex) {
-            assert ex.getMessage() != null;
-            err.println(ex.getMessage());
+            assert ex.getError() != null;
+            listener.onError(ex.getError());
             return false;
         }
     }
@@ -76,18 +96,28 @@ public final class ASTInterpreter implements Interpreter {
         return interpret(code, symTable, null);
     }
     
-    public Value interpret(AST code, Map<String, Value> symTable, PrintStream out) {
-        return new InterpretVisitor(out, symTable).eval(code);
+    public Value interpret(AST code, Map<String, Value> symTable, InterpreterListener listener) {
+        return new InterpretVisitor(listener, symTable).eval(code);
+    }
+    
+    private static InterpreterError toInterpretError(ParserError parseError) {
+        return new InterpreterError(
+                parseError.message, 
+                parseError.offendingStartOffset,
+                parseError.offendingStartLine, 
+                parseError.offendingStartColumn, 
+                parseError.offendingLength
+        );
     }
     
     private static final class InterpretVisitor implements ASTVisitor<Value> {
         
-        private final PrintStream out;
+        private final InterpreterListener listener;
         
         private final Map<String, Value> symTab;
 
-        public InterpretVisitor(PrintStream out, Map<String, Value> symTab) {
-            this.out = out;
+        public InterpretVisitor(InterpreterListener listener, Map<String, Value> symTab) {
+            this.listener = listener;
             this.symTab = symTab;
         }
 
@@ -106,11 +136,16 @@ public final class ASTInterpreter implements Interpreter {
         public <T extends Value> T eval(Class<T> cls, AST expr) {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
-                throw new ASTInterpreterException(
-                        position(expr) + "mismatched types: " 
-                                + "expected \"" + getValueType(cls) + "\"," 
-                                + " but found \"" + getValueType(val.getClass()) + "\""
+                InterpreterError error = new InterpreterError(
+                        "mismatched types: " 
+                            + "expected \"" + getValueType(cls) + "\"," 
+                            + " but found \"" + getValueType(val.getClass()) + "\"", 
+                        expr.getStart().getOffset(), 
+                        expr.getStart().getLine(),
+                        expr.getStart().getColumn(), 
+                        expr.getStop().getOffset() - expr.getStart().getOffset()
                 );
+                throw new ASTInterpreterException(error);
             }
             return (T) val;
         }
@@ -212,9 +247,14 @@ public final class ASTInterpreter implements Interpreter {
         public Value visitRefExpr(RefExpr expr) {
             Value val = symTab.get(expr.getName());
             if (val == null) {
-                throw new ASTInterpreterException(
-                        position(expr) + "unresolved variable: \"" + expr.getName() + "\""
+                InterpreterError error = new InterpreterError(
+                        "unresolved variable: \"" + expr.getName() + "\"", 
+                        expr.getStart().getOffset(), 
+                        expr.getStart().getLine(),
+                        expr.getStart().getColumn(), 
+                        expr.getStop().getOffset() - expr.getStart().getOffset()
                 );
+                throw new ASTInterpreterException(error);
             }
             return val;
         }
@@ -228,10 +268,14 @@ public final class ASTInterpreter implements Interpreter {
         @Override
         public Value visitVarDeclStmt(VarDeclStmt stmt) {
             if (symTab.containsKey(stmt.getName())) {
-                throw new ASTInterpreterException(
-                        position(stmt) + "redeclaration of variable "
-                                + "\"" + stmt.getName() + "\""
+                InterpreterError error = new InterpreterError(
+                        "redeclaration of variable " + "\"" + stmt.getName() + "\"", 
+                        stmt.getStart().getOffset(), 
+                        stmt.getStart().getLine(),
+                        stmt.getStart().getColumn(), 
+                        stmt.getStop().getOffset() - stmt.getStart().getOffset()
                 );
+                throw new ASTInterpreterException(error);
             }
             Value varValue = eval(stmt.getInitializer());
             symTab.put(stmt.getName(), varValue);
@@ -240,18 +284,18 @@ public final class ASTInterpreter implements Interpreter {
 
         @Override
         public Value visitOutStmt(OutStmt stmt) {
-            if (out != null) {
-                out.print(eval(stmt.getExpression()));
+            if (listener != null) {
+                listener.onOut(String.valueOf(eval(stmt.getExpression())));
             }
             return VoidValueImpl.INSTANCE;
         }
 
         @Override
         public Value visitPrintStmt(PrintStmt stmt) {
-            if (out != null) {
+            if (listener != null) {
                 String literal = stmt.getMessage().getString();
                 assert literal.length() > 1; // "" = 2
-                out.print(literal.substring(1, literal.length() - 1));
+                listener.onOut(literal.substring(1, literal.length() - 1));
             }
             return VoidValueImpl.INSTANCE;
         }

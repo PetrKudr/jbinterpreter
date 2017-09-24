@@ -16,14 +16,14 @@ import ru.spb.petrk.ast.VarDeclStmt;
  *
  * @author petrk
  */
-public class VarDeclStmtImpl extends OffsetableAST implements VarDeclStmt {
+public class VarDeclStmtImpl extends LeftOffsetableASTBase implements VarDeclStmt {
     
     private final String name;
     
     private final Expr initializer;
 
-    public VarDeclStmtImpl(String name, Expr initializer, int line, int column) {
-        super(line, column);
+    public VarDeclStmtImpl(String name, Expr initializer, Position left) {
+        super(left);
         this.name = name;
         this.initializer = initializer;
     }
@@ -41,5 +41,10 @@ public class VarDeclStmtImpl extends OffsetableAST implements VarDeclStmt {
     @Override
     public List<AST> getChildren() {
         return Arrays.asList(initializer);
+    }
+
+    @Override
+    public Position getStop() {
+        return initializer.getStop();
     }
 }

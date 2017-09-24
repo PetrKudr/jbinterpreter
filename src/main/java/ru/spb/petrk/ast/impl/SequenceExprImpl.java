@@ -16,13 +16,14 @@ import ru.spb.petrk.ast.Stmt;
  *
  * @author petrk
  */
-public class SequenceExprImpl implements SequenceExpr {
+public class SequenceExprImpl extends LeftRightOffsetableASTBase implements SequenceExpr {
     
     private final Expr LHS;
     
     private final Expr RHS;
 
-    public SequenceExprImpl(Expr LHS, Expr RHS) {
+    public SequenceExprImpl(Expr LHS, Expr RHS, Position left, Position right) {
+        super(left, right);
         this.LHS = LHS;
         this.RHS = RHS;
     }
@@ -40,15 +41,5 @@ public class SequenceExprImpl implements SequenceExpr {
     @Override
     public List<AST> getChildren() {
         return Arrays.asList(LHS, RHS);
-    }
-
-    @Override
-    public int getLine() {
-        return LHS.getLine();
-    }
-
-    @Override
-    public int getColumn() {
-        return LHS.getColumn();
     }
 }

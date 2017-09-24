@@ -5,13 +5,22 @@
  */
 package ru.spb.petrk.interpreter.astbased;
 
+import ru.spb.petrk.interpreter.InterpreterError;
+
 /**
  *
  * @author petrk
  */
 /*package*/ class ASTInterpreterException extends RuntimeException {
+    
+    private final InterpreterError error;
 
-    public ASTInterpreterException(String message) {
-        super(message);
+    public ASTInterpreterException(InterpreterError error) {
+        super(error.message);
+        this.error = error;
+    }
+
+    public InterpreterError getError() {
+        return error;
     }
 }

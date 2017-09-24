@@ -16,7 +16,16 @@ public interface AST {
     
     List<? extends AST> getChildren();
     
-    public int getLine();
+    public Position getStart();
     
-    public int getColumn();
+    public Position getStop();
+    
+    public interface Position {
+        
+        int getOffset();
+        
+        int getLine();
+        
+        int getColumn();
+    }
 }

@@ -8,6 +8,7 @@ package ru.spb.petrk.ast;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -17,6 +18,7 @@ import ru.spb.petrk.antlr4.JetBrainsLanguageParser.MultiplicativeExprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.PowerExprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.UnaryExprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageVisitor;
+import ru.spb.petrk.ast.AST.Position;
 import ru.spb.petrk.ast.BinaryOperator.OpKind;
 import ru.spb.petrk.ast.impl.BinaryOperatorImpl;
 import ru.spb.petrk.ast.impl.FloatingLiteralImpl;
@@ -24,6 +26,7 @@ import ru.spb.petrk.ast.impl.IntegerLiteralImpl;
 import ru.spb.petrk.ast.impl.LambdaExprImpl;
 import ru.spb.petrk.ast.impl.MapOperatorImpl;
 import ru.spb.petrk.ast.impl.OutStmtImpl;
+import ru.spb.petrk.ast.impl.PositionImpl;
 import ru.spb.petrk.ast.impl.PrintStmtImpl;
 import ru.spb.petrk.ast.impl.ProgramStmtImpl;
 import ru.spb.petrk.ast.impl.ReduceOperatorImpl;
@@ -62,30 +65,26 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     public VarDeclStmt visitVarStmt(JetBrainsLanguageParser.VarStmtContext ctx) {
         String name = ctx.IDENTIFIER().getText();
         Expr expr = visitAdditiveExpr(ctx.additiveExpr());
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
-        return new VarDeclStmtImpl(name, expr, line, column);
+        return new VarDeclStmtImpl(name, expr, tok2StartPos(ctx.IDENTIFIER()));
     }
 
     @Override
     public OutStmt visitOutStmt(JetBrainsLanguageParser.OutStmtContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
-        return new OutStmtImpl(visitAdditiveExpr(ctx.additiveExpr()), line, column);
+        return new OutStmtImpl(
+                visitAdditiveExpr(ctx.additiveExpr()), 
+                tok2StartPos(ctx.LITERAL_OUT())
+        );
     }
 
     @Override
     public PrintStmt visitPrintStmt(JetBrainsLanguageParser.PrintStmtContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
         return new PrintStmtImpl(
                 new StringLiteralImpl(
                         ctx.STRING().getText(),
-                        ctx.STRING().getSymbol().getLine(),
-                        ctx.STRING().getSymbol().getCharPositionInLine()
+                        tok2StartPos(ctx.STRING()),
+                        tok2StopPos(ctx.STRING())
                 ),
-                line,
-                column
+                tok2StartPos(ctx.LITERAL_PRINT())
         );
     }
 
@@ -148,9 +147,11 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     @Override
     public Expr visitUnaryExpr(JetBrainsLanguageParser.UnaryExprContext ctx) {
         if (ctx.MINUS() != null) {
-            int line = ctx.getStart().getLine();
-            int column = ctx.getStart().getCharPositionInLine();
-            return new UnaryOperatorImpl(true, visitAtom(ctx.atom()), line, column);
+            return new UnaryOperatorImpl(
+                    true, 
+                    visitAtom(ctx.atom()),
+                    tok2StartPos(ctx.MINUS())
+            );
         }
         return visitAtom(ctx.atom());
     }
@@ -169,109 +170,155 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             return visitReduceOperator(ctx.reduceOperator());
         }
         assert ctx.IDENTIFIER() != null;
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
-        return new RefExprImpl(ctx.IDENTIFIER().getSymbol().getText(), line, column);
+        return new RefExprImpl(
+                ctx.IDENTIFIER().getText(), 
+                tok2StartPos(ctx.IDENTIFIER()), 
+                tok2StopPos(ctx.IDENTIFIER())
+        );
     }
 
     @Override
     public SequenceExpr visitSequence(JetBrainsLanguageParser.SequenceContext ctx) {
         return new SequenceExprImpl(
                 visitAdditiveExpr(ctx.additiveExpr(0)),
-                visitAdditiveExpr(ctx.additiveExpr(1))
+                visitAdditiveExpr(ctx.additiveExpr(1)),
+                tok2StartPos(ctx.LCURLY()),
+                tok2StopPos(ctx.RCURLY())
         );
     }
 
     @Override
     public Expr visitNumber(JetBrainsLanguageParser.NumberContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
+        Position start = tok2StartPos(ctx.getStart());
+        Position stop = tok2StopPos(ctx.getStart());
         if (ctx.INTEGER_NUMBER() != null) {
             try {
                 return new IntegerLiteralImpl(
                         Integer.parseInt(ctx.INTEGER_NUMBER().getText()),
-                        line,
-                        column
+                        start,
+                        stop
                 );
             } catch (NumberFormatException ex) {
-                throw new NumberFormatException(
-                        ASTUtils.position(line, column) + "number \"" 
-                                + ctx.INTEGER_NUMBER().getText() 
-                                + "\" is too big"
-                );
+                throw new ASTBuildException(new ASTUtils.ParserError(
+                        "number \""+ ctx.INTEGER_NUMBER().getText() + "\" is too big",
+                        start.getOffset(),
+                        start.getLine(),
+                        start.getColumn(),
+                        ctx.INTEGER_NUMBER().getSymbol().getStopIndex() - start.getOffset()
+                ));
             }
         }
         assert ctx.DOUBLE_NUMBER() != null;
         try {
             return new FloatingLiteralImpl(
                     Double.parseDouble(ctx.DOUBLE_NUMBER().getSymbol().getText()),
-                    line,
-                    column
+                    start,
+                    stop
             );
         } catch (NumberFormatException ex) {
-            throw new NumberFormatException(
-                    ASTUtils.position(line, column) + "number \"" 
-                            + ctx.DOUBLE_NUMBER().getText() 
-                            + "\" is too big"
-            );
+            throw new ASTBuildException(new ASTUtils.ParserError(
+                    "number \"" + ctx.DOUBLE_NUMBER().getText() + "\" is too big",
+                    start.getOffset(),
+                    start.getLine(),
+                    start.getColumn(),
+                    ctx.DOUBLE_NUMBER().getSymbol().getStopIndex() - start.getOffset()
+            ));
         }
     }
 
     @Override
     public MapOperator visitMapOperator(JetBrainsLanguageParser.MapOperatorContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
         return new MapOperatorImpl(
                 visitAdditiveExpr(ctx.additiveExpr()), 
                 visitMapLambda(ctx.mapLambda()),
-                line,
-                column
+                tok2StartPos(ctx.getStart()),
+                tok2StopPos(ctx.getStop())
         );
     }
     
     @Override
     public ReduceOperator visitReduceOperator(JetBrainsLanguageParser.ReduceOperatorContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
         return new ReduceOperatorImpl(
                 visitAdditiveExpr(ctx.additiveExpr(0)), 
                 visitAdditiveExpr(ctx.additiveExpr(1)),
                 visitReduceLambda(ctx.reduceLambda()),
-                line,
-                column
+                tok2StartPos(ctx.getStart()),
+                tok2StopPos(ctx.getStop())
         );
     }
 
     @Override
     public LambdaExpr visitMapLambda(JetBrainsLanguageParser.MapLambdaContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
         return new LambdaExprImpl(
                 Arrays.asList(ctx.IDENTIFIER().getSymbol().getText()), 
                 visitAdditiveExpr(ctx.additiveExpr()),
-                line,
-                column
+                tok2StartPos(ctx.IDENTIFIER())
         );
     }
 
     @Override
     public LambdaExpr visitReduceLambda(JetBrainsLanguageParser.ReduceLambdaContext ctx) {
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
+        Position start = tok2StartPos(ctx.getStart());
         assert ctx.IDENTIFIER().size() == 2 : "Reduce lambda with more than 2 parameters?";
         if (ctx.IDENTIFIER(0).getText().equals(ctx.IDENTIFIER(1).getText())) {
-            throw new ParseCancellationException(
-                    ASTUtils.position(line, column) 
-                            + " parameters of the lambda cannot have the same name"
-            );
+            throw new ASTBuildException(new ASTUtils.ParserError(
+                    "parameters of the lambda cannot have the same name",
+                    start.getOffset(),
+                    start.getLine(),
+                    start.getColumn(),
+                    ctx.IDENTIFIER(1).getSymbol().getStopIndex() - start.getOffset()
+            ));
         }
         return new LambdaExprImpl(
                 ctx.IDENTIFIER().stream()
                         .map(id -> id.getText())
                         .collect(Collectors.toList()), 
                 visitAdditiveExpr(ctx.additiveExpr()),
-                line,
-                column
+                start
         );
+    }
+    
+    private static Position tok2StartPos(TerminalNode node) {
+        return tok2StartPos(node.getSymbol());
+    }
+    
+    private static Position tok2StartPos(Token tok) {
+        int offset = tok.getStartIndex();
+        int line = tok.getLine();
+        int column = tok.getCharPositionInLine();
+        return new PositionImpl(offset, line, column);
+    }
+    
+    private static Position tok2StopPos(TerminalNode node) {
+        return tok2StopPos(node.getSymbol());
+    }
+    
+    private static Position tok2StopPos(Token tok) {
+        int offset = tok.getStopIndex();
+        int line = tok.getLine();
+        int column = tok.getCharPositionInLine() + tok.getText().length();
+        if (tok.getType() == JetBrainsLanguageLexer.STRING) {
+            String tokText = tok.getText();
+            int newLineCounter = 0;
+            int lastNewLineIndex = 0;
+            for (int i = 0; i < tokText.length(); ++i) {
+                if (tokText.charAt(i) == '\n') {
+                    ++newLineCounter;
+                    lastNewLineIndex = i;
+                }
+            }
+            line += newLineCounter;
+            column = tokText.length() - lastNewLineIndex;
+        }
+        return new PositionImpl(offset, line, column);
+    }
+    
+    public static class ASTBuildException extends RuntimeException {
+        
+        public final ASTUtils.ParserError error;
+
+        public ASTBuildException(ASTUtils.ParserError error) {
+            this.error = error;
+        }
     }
 }

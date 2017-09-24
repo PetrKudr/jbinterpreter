@@ -34,12 +34,16 @@ public class ProgramStmtImpl implements ProgramStmt {
     }
 
     @Override
-    public int getLine() {
-        return statements.isEmpty() ? 0 : statements.get(0).getLine();
+    public Position getStart() {
+        return statements.isEmpty() 
+                ? PositionImpl.EMPTY 
+                : statements.get(0).getStart();
     }
 
     @Override
-    public int getColumn() {
-        return statements.isEmpty() ? 0 : statements.get(0).getColumn();
+    public Position getStop() {
+        return statements.isEmpty() 
+                ? PositionImpl.EMPTY 
+                : statements.get(statements.size() - 1).getStop();
     }
 }

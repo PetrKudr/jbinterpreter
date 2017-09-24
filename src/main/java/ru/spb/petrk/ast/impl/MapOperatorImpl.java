@@ -17,14 +17,14 @@ import ru.spb.petrk.ast.Stmt;
  *
  * @author petrk
  */
-public class MapOperatorImpl extends OffsetableAST implements MapOperator {
+public class MapOperatorImpl extends LeftRightOffsetableASTBase implements MapOperator {
     
     private final Expr sequence;
     
     private final LambdaExpr lambda;
 
-    public MapOperatorImpl(Expr sequence, LambdaExpr lambda, int line, int column) {
-        super(line, column);
+    public MapOperatorImpl(Expr sequence, LambdaExpr lambda, Position left, Position right) {
+        super(left, right);
         this.sequence = sequence;
         this.lambda = lambda;
     }
