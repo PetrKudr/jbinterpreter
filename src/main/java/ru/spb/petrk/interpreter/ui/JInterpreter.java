@@ -5,47 +5,32 @@
  */
 package ru.spb.petrk.interpreter.ui;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.StandardOpenOption;
-import java.util.stream.Stream;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.Utilities;
-import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 
 /**
  *
@@ -66,6 +51,12 @@ public class JInterpreter extends javax.swing.JFrame {
      */
     public JInterpreter() {
         initComponents();
+        
+        RSyntaxTextArea rsta = (RSyntaxTextArea) editorArea;
+        AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+        atmf.putMapping("text/jblanguage", "ru.spb.petrk.interpreter.ui.JBSyntaxAreaTokenMaker");
+        rsta.setSyntaxEditingStyle("text/jblanguage");
+        JBSyntaxAreaTokenMaker.setPredefinedScheme(rsta);
         
         // Set undo/redo
         editorArea.getDocument().addUndoableEditListener(editorUndoManager);
