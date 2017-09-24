@@ -5,15 +5,23 @@
  */
 package ru.spb.petrk.interpreter.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.text.JTextComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SquiggleUnderlineHighlightPainter;
 import ru.spb.petrk.interpreter.Interpreter;
+import ru.spb.petrk.interpreter.InterpreterError;
+import ru.spb.petrk.interpreter.InterpreterListener;
 import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 
 /**
@@ -22,17 +30,22 @@ import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
  */
 public class ShowInterpretationTask implements Runnable {
     
-    public final String input;
+    private final static Logger LOG = Logger.getLogger(ShowInterpretationTask.class.getName());
+    
+    private final String text;
+    
+    private final RSyntaxTextArea input;
     
     // Modifications of a text in the output are made in the single 
     // thread (InterpreterController's worker). Threrefore synchronization
     // is not required
-    public final JTextArea output; 
+    private final JTextArea output; 
     
     private volatile Future<?> taskFuture;
 
-    public ShowInterpretationTask(JTextComponent input, JTextArea output) {
-        this.input = input.getText();
+    public ShowInterpretationTask(RSyntaxTextArea input, JTextArea output) {
+        this.text = input.getText();
+        this.input = input;
         this.output = output;
         assert !output.isEditable() : "If output is editable, it must be properly synchronized!";
     }
@@ -44,9 +57,51 @@ public class ShowInterpretationTask implements Runnable {
     @Override
     public void run() {
         output.setText("");
-        PrintStream out = new PrintStream(new TextAreaOutputStream());
+        clearErrors(input);
+        final PrintStream out = new PrintStream(new TextAreaOutputStream());
         Interpreter interpreter = new ASTInterpreter();
-        interpreter.interpret(input, out, out);
+        interpreter.interpret(text, new InterpreterListener() {
+            
+            private boolean hadOutput = false;
+            
+            @Override
+            public void onOut(String msg) {
+                hadOutput = true;
+                out.print(msg);
+            }
+
+            @Override
+            public void onError(InterpreterError error) {
+                if (hadOutput) {
+                    out.println();
+                    hadOutput = false;
+                }
+                out.println(error.toString());
+                highlightError(input, error);
+            }
+        });
+    }
+    
+    private static void clearErrors(RSyntaxTextArea pane) {
+        SwingUtilities.invokeLater(() -> {
+            pane.getHighlighter().removeAllHighlights();
+        });
+    }
+    
+    private static void highlightError(RSyntaxTextArea pane, InterpreterError error) {
+        if (error.offendingLength > 0) {
+            SwingUtilities.invokeLater(() -> {
+                    try {
+                        pane.getHighlighter().addHighlight(
+                                error.offendingStartOffset, 
+                                error.offendingStartOffset + error.offendingLength, 
+                                new SquiggleUnderlineHighlightPainter(Color.RED)
+                        );
+                    } catch (BadLocationException ex) {
+                        LOG.log(Level.FINE, ex.getMessage(), ex);
+                    }
+            });
+        }
     }
     
     // OutputStream adapter for JTextArea

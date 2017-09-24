@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.ui;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -30,10 +31,21 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.Utilities;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 
 /**
  *
@@ -56,9 +68,9 @@ public class JInterpreter extends javax.swing.JFrame {
         initComponents();
         
         // Set undo/redo
-        editorPane.getDocument().addUndoableEditListener(editorUndoManager);
-        InputMap im = editorPane.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap am = editorPane.getActionMap();
+        editorArea.getDocument().addUndoableEditListener(editorUndoManager);
+        InputMap im = editorArea.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap am = editorArea.getActionMap();
 
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Undo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Redo");
@@ -81,10 +93,10 @@ public class JInterpreter extends javax.swing.JFrame {
         });
         
         // Set interpretation
-        editorPane.getDocument().addDocumentListener(new DocumentListener() {
+        editorArea.getDocument().addDocumentListener(new DocumentListener() {
             
             private void onUpdate(DocumentEvent e) {
-                controller.post(new ShowInterpretationTask(editorPane, outputArea));
+                controller.post(new ShowInterpretationTask((RSyntaxTextArea) editorArea, outputArea));
             }
             
             @Override
@@ -103,27 +115,27 @@ public class JInterpreter extends javax.swing.JFrame {
             }
         });
         
-        editorPane.addCaretListener((CaretEvent e) -> {
+        editorArea.addCaretListener((CaretEvent e) -> {
             try {
                 int caretPos = e.getDot();
-                int line = getLineOfOffset(editorPane, caretPos);
-                int column = caretPos - getLineStartOffset(editorPane, caretPos);
+                int line = getLineOfOffset(editorArea, caretPos);
+                int column = caretPos - getLineStartOffset(editorArea, caretPos);
                 editorPositionLabel.setText(String.format("%d:%d", line + 1, column + 1));
             } catch (BadLocationException ex) {
                 editorPositionLabel.setText("bad location");
             }
         });
         
-        editorPane.setText("print \"Hello, World!\"");
+        editorArea.setText("print \"Hello, World!\"");
     }
     
-    private static int getLineOfOffset(JTextPane pane, int offset) {
+    private static int getLineOfOffset(JTextComponent pane, int offset) {
         return pane.getDocument()
                 .getDefaultRootElement()
-                .getElementIndex(offset) + 1;
+                .getElementIndex(offset);
     }
     
-    private static int getLineStartOffset(JTextPane pane, int offset) throws BadLocationException {
+    private static int getLineStartOffset(JTextComponent pane, int offset) throws BadLocationException {
         return Utilities.getRowStart(pane, offset);
     }
 
@@ -137,8 +149,8 @@ public class JInterpreter extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        editorPane = new javax.swing.JTextPane();
+        jScrollPane1 = new org.fife.ui.rtextarea.RTextScrollPane();
+        editorArea = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         outputArea = new javax.swing.JTextArea();
         statusBarPanel = new javax.swing.JPanel();
@@ -160,8 +172,9 @@ public class JInterpreter extends javax.swing.JFrame {
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setPreferredSize(new java.awt.Dimension(58, 8));
 
-        editorPane.setFont(new java.awt.Font("Courier New", 0, 15)); // NOI18N
-        jScrollPane1.setViewportView(editorPane);
+        editorArea.setColumns(20);
+        editorArea.setRows(5);
+        jScrollPane1.setViewportView(editorArea);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
@@ -277,7 +290,7 @@ public class JInterpreter extends javax.swing.JFrame {
     }//GEN-LAST:event_miExitActionPerformed
 
     private void miPiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPiActionPerformed
-        editorPane.setText(
+        editorArea.setText(
                 "var n = 500\n" + 
                 "var sequence = map({0, n}, i -> (-1)^i / (2.0 * i + 1))\n" + 
                 "var pi = 4 * reduce(sequence, 0, x y -> x + y)\n" +
@@ -292,14 +305,14 @@ public class JInterpreter extends javax.swing.JFrame {
             File file = fileChooser.getSelectedFile();
             if (file.exists()) {
                 File oldOpenedFile = openedFile;
-                String oldText = editorPane.getText();
-                editorPane.setText("");
+                String oldText = editorArea.getText();
+                editorArea.setText("");
                 openedFile = file;
                 try {
                     Files.lines(file.toPath()).forEach(line -> {
                         try {
-                            editorPane.getDocument().insertString(
-                                    editorPane.getDocument().getLength(), 
+                            editorArea.getDocument().insertString(
+                                    editorArea.getDocument().getLength(), 
                                     line + "\n", 
                                     null
                             );
@@ -309,7 +322,7 @@ public class JInterpreter extends javax.swing.JFrame {
                     });
                 } catch (Throwable ex) {
                     openedFile = oldOpenedFile;
-                    editorPane.setText(oldText);
+                    editorArea.setText(oldText);
                     JOptionPane.showMessageDialog(this, "Failed to open file: " + ex.getMessage());
                 }
             } else {
@@ -335,7 +348,7 @@ public class JInterpreter extends javax.swing.JFrame {
     }//GEN-LAST:event_miSaveFileAsActionPerformed
 
     private void miSeqOfSeqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSeqOfSeqActionPerformed
-        editorPane.setText(
+        editorArea.setText(
                 "var seqOfSeq = map({1, 3}, val->{1, val})\n" +
                 "print \"Sum(\" \n" +
                 "out seqOfSeq\n" +
@@ -354,7 +367,7 @@ public class JInterpreter extends javax.swing.JFrame {
         try {
             Files.write(
                     toFile.toPath(),
-                    editorPane.getText().getBytes(StandardCharsets.UTF_8),
+                    editorArea.getText().getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.CREATE
             );
@@ -400,7 +413,7 @@ public class JInterpreter extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextPane editorPane;
+    private javax.swing.JTextArea editorArea;
     private javax.swing.JLabel editorPositionLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
