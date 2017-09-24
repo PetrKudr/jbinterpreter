@@ -90,11 +90,12 @@ public class ShowInterpretationTask implements Runnable {
     
     private static void highlightError(RSyntaxTextArea pane, InterpreterError error) {
         if (error.offendingLength > 0) {
+            final int textEnd = pane.getDocument().getLength();
             SwingUtilities.invokeLater(() -> {
                     try {
                         pane.getHighlighter().addHighlight(
-                                error.offendingStartOffset, 
-                                error.offendingStartOffset + error.offendingLength, 
+                                Math.min(textEnd, error.offendingStartOffset), 
+                                Math.min(textEnd, error.offendingStartOffset + error.offendingLength), 
                                 new SquiggleUnderlineHighlightPainter(Color.RED)
                         );
                     } catch (BadLocationException ex) {

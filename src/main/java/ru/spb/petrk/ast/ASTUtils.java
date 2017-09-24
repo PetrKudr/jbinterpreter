@@ -186,7 +186,7 @@ public final class ASTUtils {
                         ex.getStartIndex(), 
                         line, 
                         charPositionInLine, 
-                        lexer.getCharIndex() - ex.getStartIndex()
+                        Math.max(lexer.getCharIndex() - ex.getStartIndex(), 1)
                 );
             } else if (offendingSymbol instanceof Token) {
                 Token tok = (Token) offendingSymbol;
