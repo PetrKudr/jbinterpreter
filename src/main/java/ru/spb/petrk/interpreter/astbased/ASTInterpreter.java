@@ -143,7 +143,7 @@ public final class ASTInterpreter implements Interpreter {
                         expr.getStart().getOffset(), 
                         expr.getStart().getLine(),
                         expr.getStart().getColumn(), 
-                        expr.getStop().getOffset() - expr.getStart().getOffset()
+                        expr.getStop().getOffset() - expr.getStart().getOffset() + 1
                 );
                 throw new ASTInterpreterException(error);
             }
@@ -252,7 +252,7 @@ public final class ASTInterpreter implements Interpreter {
                         expr.getStart().getOffset(), 
                         expr.getStart().getLine(),
                         expr.getStart().getColumn(), 
-                        expr.getStop().getOffset() - expr.getStart().getOffset()
+                        expr.getStop().getOffset() - expr.getStart().getOffset() + 1
                 );
                 throw new ASTInterpreterException(error);
             }
@@ -273,7 +273,7 @@ public final class ASTInterpreter implements Interpreter {
                         stmt.getStart().getOffset(), 
                         stmt.getStart().getLine(),
                         stmt.getStart().getColumn(), 
-                        stmt.getStop().getOffset() - stmt.getStart().getOffset()
+                        stmt.getStop().getOffset() - stmt.getStart().getOffset() + 1
                 );
                 throw new ASTInterpreterException(error);
             }
