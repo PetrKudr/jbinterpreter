@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -52,6 +53,9 @@ public final class ASTUtils {
         ProgramStmt ast;
         try {
             ast = builder.visitProgram(parser.program());
+        } catch (SyntaxException ex) {
+            errors.add(new ParserError(ex));
+            ast = null;
         } catch (ParseCancellationException ex) {
             errors.add(new ParserError(ex));
             ast = null;
@@ -93,7 +97,7 @@ public final class ASTUtils {
             this.offendingStartOffset = -1;
             this.offendingStartLine = -1;
             this.offendingStartColumn = -1;
-            this.offendingLength = -1;
+            this.offendingLength = 0;
         }
 
         /*package*/ ParserError(String message, int offendingStartOffset, int offendingStartLine, int offendingStartColumn, int offendingLength) {
@@ -104,30 +108,42 @@ public final class ASTUtils {
             this.offendingLength = offendingLength;
         }
         
-        /*package*/ ParserError(RecognitionException ex) {
-            Token offendingToken = ex.getOffendingToken();
+        private ParserError(SyntaxException ex) {
+            this.message = ex.getMessage();
+            this.offendingStartOffset = ex.offset;
+            this.offendingStartLine = ex.line;
+            this.offendingStartColumn = ex.column;
+            this.offendingLength = ex.length;
+        }
+        
+        private ParserError(RecognitionException ex) {
+            Token offendingToken = ex.getOffendingToken() != null 
+                    ? ex.getOffendingToken()
+                    : ((Parser) ex.getRecognizer()).getCurrentToken();
             this.message = ex.getMessage();
             this.offendingStartOffset = offendingToken.getStartIndex();
             this.offendingStartLine = offendingToken.getLine();
             this.offendingStartColumn = offendingToken.getCharPositionInLine();
-            this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex();
+            this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex() + 1;
         }
         
-        /*package*/ ParserError(ParseCancellationException ex) {
+        private ParserError(ParseCancellationException ex) {
             if (ex.getCause() instanceof RecognitionException) {
                 this.message = ex.getMessage();
                 RecognitionException re = (RecognitionException) ex.getCause();
-                Token offendingToken = re.getOffendingToken();
+                Token offendingToken = re.getOffendingToken() != null 
+                    ? re.getOffendingToken()
+                    : ((Parser) re.getRecognizer()).getCurrentToken();
                 this.offendingStartOffset = offendingToken.getStartIndex();
                 this.offendingStartLine = offendingToken.getLine();
                 this.offendingStartColumn = offendingToken.getCharPositionInLine();
-                this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex();
+                this.offendingLength = offendingToken.getStopIndex() - offendingToken.getStartIndex() + 1;
             } else {
                 this.message = "Unrecognized parse or lex error!";
                 this.offendingStartOffset = -1;
                 this.offendingStartLine = -1;
                 this.offendingStartColumn = -1;
-                this.offendingLength = -1;
+                this.offendingLength = 0;
             }
         }
 
@@ -137,13 +153,50 @@ public final class ASTUtils {
         }
     }
     
+    private static final class SyntaxException extends RuntimeException {
+
+        public final int offset;
+        
+        public final int line;
+        
+        public final int column;
+        
+        public final int length;
+
+        public SyntaxException(String message, int offset, int line, int column, int length) {
+            super(message);
+            this.offset = offset;
+            this.line = line;
+            this.column = column;
+            this.length = length;
+        }
+    }
+    
     private static final class ParserErrorsListener extends BaseErrorListener {
         
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                 int line, int charPositionInLine,
                 String msg, RecognitionException e) {
-            throw new ParseCancellationException(msg, e);
+            if (e instanceof LexerNoViableAltException) {
+                JetBrainsLanguageLexer lexer = (JetBrainsLanguageLexer) recognizer;
+                LexerNoViableAltException ex = (LexerNoViableAltException) e;
+                throw new SyntaxException(
+                        msg, 
+                        ex.getStartIndex(), 
+                        line, 
+                        charPositionInLine, 
+                        lexer.getCharIndex()
+                );
+            }
+            // TODO: fix offset
+            throw new SyntaxException(
+                    msg, 
+                    -1, 
+                    line, 
+                    charPositionInLine, 
+                    0
+            );
         }
     }
     
