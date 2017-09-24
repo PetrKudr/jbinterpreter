@@ -204,7 +204,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                         start.getOffset(),
                         start.getLine(),
                         start.getColumn(),
-                        ctx.INTEGER_NUMBER().getSymbol().getStopIndex() - start.getOffset()
+                        ctx.INTEGER_NUMBER().getSymbol().getStopIndex() - start.getOffset() + 1
                 ));
             }
         }
@@ -221,7 +221,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                     start.getOffset(),
                     start.getLine(),
                     start.getColumn(),
-                    ctx.DOUBLE_NUMBER().getSymbol().getStopIndex() - start.getOffset()
+                    ctx.DOUBLE_NUMBER().getSymbol().getStopIndex() - start.getOffset() + 1
             ));
         }
     }
@@ -266,7 +266,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                     start.getOffset(),
                     start.getLine(),
                     start.getColumn(),
-                    ctx.IDENTIFIER(1).getSymbol().getStopIndex() - start.getOffset()
+                    ctx.IDENTIFIER(1).getSymbol().getStopIndex() - start.getOffset() + 1
             ));
         }
         return new LambdaExprImpl(
