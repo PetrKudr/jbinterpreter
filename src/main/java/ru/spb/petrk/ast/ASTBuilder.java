@@ -65,7 +65,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     public VarDeclStmt visitVarStmt(JetBrainsLanguageParser.VarStmtContext ctx) {
         String name = ctx.IDENTIFIER().getText();
         Expr expr = visitAdditiveExpr(ctx.additiveExpr());
-        return new VarDeclStmtImpl(name, expr, tok2StartPos(ctx.IDENTIFIER()));
+        return new VarDeclStmtImpl(name, expr, tok2StartPos(ctx.LITERAL_VAR()));
     }
 
     @Override
