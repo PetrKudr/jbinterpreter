@@ -92,10 +92,38 @@ public final class ASTInterpreter implements Interpreter {
         }
     }
     
+    /**
+     * Interprets code with the given symbol table.
+     * 
+     * Doesn't prints any output at all.
+     * 
+     * @param code
+     * @param symTable
+     * 
+     * @throws ASTInterpreterException
+     * @throws ASTInterruptedInterpreterException
+     * 
+     * @return value of the code (void value code doesn't return value)
+     */
     public Value interpret(AST code, Map<String, Value> symTable) {
         return interpret(code, symTable, null);
     }
     
+    /**
+     * Interprets code with the given symbol table.
+     * 
+     * Note, that listener will not receive error events, 
+     * because the first error triggers exception.
+     * 
+     * @param code
+     * @param symTable
+     * @param listener
+     * 
+     * @throws ASTInterpreterException
+     * @throws ASTInterruptedInterpreterException
+     * 
+     * @return value of the code (void value code doesn't return value)
+     */
     public Value interpret(AST code, Map<String, Value> symTable, InterpreterListener listener) {
         return new InterpretVisitor(listener, symTable).eval(code);
     }
