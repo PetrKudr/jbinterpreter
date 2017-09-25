@@ -15,3 +15,8 @@ Interpreter for the following language:
 * [x] Program should be interpreted on the fly
 * [x] Time-consuming calculations should not block the UI and should be cancellable
 * [x] Errors from the interpreter should be shown in the editor
+
+**Dependencies**
+* **ANTLR4** for lexer/parser
+* **RSyntaxTextArea** for editor
+* **JUnit** for tests
