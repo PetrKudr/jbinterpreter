@@ -23,7 +23,7 @@ public interface Interpreter {
      * @param input - code of a program
      * @param out - out print stream
      * @param err - err print stream
-     * @return true if no errors occured, false otherwise
+     * @return true if no errors occurred, false otherwise
      */
     boolean interpret(String input, PrintStream out, PrintStream err);
     
@@ -35,8 +35,8 @@ public interface Interpreter {
      * declared in previous interpretation are not visible).
      * 
      * @param input - code of a program
-     * @param listener
-     * @return true if no errors occured, false otherwise
+     * @param listener listens output and error events
+     * @return true if no errors occurred, false otherwise
      */
     boolean interpret(String input, InterpreterListener listener);
 }
