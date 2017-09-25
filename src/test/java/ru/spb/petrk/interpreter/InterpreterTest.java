@@ -87,7 +87,7 @@ public class InterpreterTest extends TestCase {
         assertTrue(interpreted.startsWith(golden));
     }
     
-    private String interpret(String input) {
+    /*package*/static String interpret(String input) {
         final Charset charset = StandardCharsets.UTF_8;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PrintStream ps = new PrintStream(baos, true, charset.name())) {
@@ -100,7 +100,7 @@ public class InterpreterTest extends TestCase {
         }
     }
     
-    private Interpreter createInterpreter() {
+    private static Interpreter createInterpreter() {
         return new ASTInterpreter();
     }
 }
