@@ -103,7 +103,7 @@ public final class ASTInterpreter implements Interpreter {
      * @throws ASTInterpreterException
      * @throws ASTInterruptedInterpreterException
      * 
-     * @return value of the code (void value code doesn't return value)
+     * @return value of the code (void value if code doesn't return value)
      */
     public Value interpret(AST code, Map<String, Value> symTable) {
         return interpret(code, symTable, null);
@@ -122,7 +122,7 @@ public final class ASTInterpreter implements Interpreter {
      * @throws ASTInterpreterException
      * @throws ASTInterruptedInterpreterException
      * 
-     * @return value of the code (void value code doesn't return value)
+     * @return value of the code (void value if code doesn't return value)
      */
     public Value interpret(AST code, Map<String, Value> symTable, InterpreterListener listener) {
         return new InterpretVisitor(listener, symTable).eval(code);
