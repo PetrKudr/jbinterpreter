@@ -36,9 +36,6 @@ public class ShowInterpretationTask implements Runnable {
     
     private final RSyntaxTextArea input;
     
-    // Modifications of a text in the output are made in the single 
-    // thread (InterpreterController's worker). Threrefore synchronization
-    // is not required
     private final JTextArea output; 
     
     private volatile Future<?> taskFuture;
@@ -47,7 +44,6 @@ public class ShowInterpretationTask implements Runnable {
         this.text = input.getText();
         this.input = input;
         this.output = output;
-        assert !output.isEditable() : "If output is editable, it must be properly synchronized!";
     }
     
     public void setTaskFuture(Future<?> taskFuture) {
@@ -56,7 +52,7 @@ public class ShowInterpretationTask implements Runnable {
 
     @Override
     public void run() {
-        output.setText("");
+        clearOutput(output);
         clearErrors(input);
         final PrintStream out = new PrintStream(new TextAreaOutputStream());
         Interpreter interpreter = new ASTInterpreter();
@@ -66,19 +62,30 @@ public class ShowInterpretationTask implements Runnable {
             
             @Override
             public void onOut(String msg) {
-                hadOutput = true;
-                out.print(msg);
+                SwingUtilities.invokeLater(() -> {
+                    hadOutput = true;
+                    out.print(msg);
+                });
             }
 
             @Override
             public void onError(InterpreterError error) {
-                if (hadOutput) {
-                    out.println();
-                    hadOutput = false;
-                }
-                out.println(error.toString());
-                highlightError(input, error);
+                SwingUtilities.invokeLater(() -> {
+                    if (hadOutput) {
+                        out.println();
+                        hadOutput = false;
+                    }
+                    out.println(error.toString());
+                    highlightError(input, error);
+                });
             }
+        });
+    }
+    
+    
+    private static void clearOutput(JTextArea output) {
+        SwingUtilities.invokeLater(() -> {
+            output.setText("");
         });
     }
     
@@ -89,19 +96,18 @@ public class ShowInterpretationTask implements Runnable {
     }
     
     private static void highlightError(RSyntaxTextArea pane, InterpreterError error) {
+        assert SwingUtilities.isEventDispatchThread();
         if (error.offendingLength > 0) {
             final int textEnd = pane.getDocument().getLength();
-            SwingUtilities.invokeLater(() -> {
-                    try {
-                        pane.getHighlighter().addHighlight(
-                                Math.min(textEnd, error.offendingStartOffset), 
-                                Math.min(textEnd, error.offendingStartOffset + error.offendingLength), 
-                                new SquiggleUnderlineHighlightPainter(Color.RED)
-                        );
-                    } catch (BadLocationException ex) {
-                        LOG.log(Level.FINE, ex.getMessage(), ex);
-                    }
-            });
+            try {
+                pane.getHighlighter().addHighlight(
+                        Math.min(textEnd, error.offendingStartOffset), 
+                        Math.min(textEnd, error.offendingStartOffset + error.offendingLength), 
+                        new SquiggleUnderlineHighlightPainter(Color.RED)
+                );
+            } catch (BadLocationException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+            }
         }
     }
     
@@ -114,6 +120,7 @@ public class ShowInterpretationTask implements Runnable {
         
         @Override
         public void write(int b) throws IOException {
+            assert SwingUtilities.isEventDispatchThread();
             if (charsWritten == -1) {
                 return; // task was cancelled
             }
