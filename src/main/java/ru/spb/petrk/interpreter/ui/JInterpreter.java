@@ -54,7 +54,7 @@ public class JInterpreter extends javax.swing.JFrame {
         
         RSyntaxTextArea rsta = (RSyntaxTextArea) editorArea;
         AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
-        atmf.putMapping("text/jblanguage", "ru.spb.petrk.interpreter.ui.JBSyntaxAreaTokenMaker");
+        atmf.putMapping("text/jblanguage", JBSyntaxAreaTokenMaker.class.getName());
         rsta.setSyntaxEditingStyle("text/jblanguage");
         JBSyntaxAreaTokenMaker.setPredefinedScheme(rsta);
         
