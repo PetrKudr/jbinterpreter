@@ -47,6 +47,43 @@ public class LexerTest extends TestCase {
     }
     
     @Test
+    public void testKeywords() throws Exception {
+        assertEquals(
+                "[LITERAL_VAR, var] "
+                        + "[LITERAL_OUT, out] "
+                        + "[LITERAL_PRINT, print] "
+                        + "[LITERAL_MAP, map] "
+                        + "[LITERAL_REDUCE, reduce] "
+                        + "[EOF]", 
+                lex("var out print map reduce")
+        );
+    }
+    
+    @Test
+    public void testOperators() throws Exception {
+        assertEquals(
+                "[PLUS, +] [MINUS, -] [DIVIDE, /] [STAR, *] [POWER, ^] [EOF]", 
+                lex("+ - / * ^")
+        );
+    }
+    
+    @Test
+    public void testAuxiliaryTokens() throws Exception {
+        assertEquals(
+                "[LPAREN, (] [RPAREN, )] [ARROW, ->] [ASSIGN, =] [LCURLY, {] [RCURLY, }] [COMMA, ,] [EOF]", 
+                lex("()->={},")
+        );
+    }
+    
+    @Test
+    public void testStrings() throws Exception {
+        assertEquals(
+                "[STRING, \"abc\"] [STRING, \"\\\"] [STRING, \"1\n2\"] [EOF]", 
+                lex("\"abc\" \"\\\" \"1\n2\"")
+        );
+    }
+    
+    @Test
     public void testExampleProgram() throws Exception {
         assertEquals(
                 "[LITERAL_VAR, var] " 
