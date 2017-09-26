@@ -6,11 +6,11 @@
 package ru.spb.petrk.ast;
 
 /**
- * Represents an AST node that corresponds to the expression rule in the language.
- * 
+ * Represents a parameter of lambda function.
+ *
  * @author petrk
  */
-public interface Expr extends AST {
+public interface ParamExpr extends Expr {
     
-    Type getType();
+    String getName();
 }

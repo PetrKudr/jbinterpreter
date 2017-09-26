@@ -11,8 +11,7 @@ import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.ReduceOperator;
-import ru.spb.petrk.ast.SequenceExpr;
-import ru.spb.petrk.ast.Stmt;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -49,6 +48,11 @@ public class ReduceOperatorImpl extends LeftRightOffsetableASTBase implements Re
     @Override
     public LambdaExpr getLambda() {
         return lambda;
+    }
+
+    @Override
+    public Type getType() {
+        return lambda.getType();
     }
 
     @Override

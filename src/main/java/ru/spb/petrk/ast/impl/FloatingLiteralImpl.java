@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.FloatingLiteral;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -26,6 +27,11 @@ public class FloatingLiteralImpl extends LeftRightOffsetableASTBase implements F
     @Override
     public double getValue() {
         return value;
+    }
+
+    @Override
+    public Type getType() {
+        return FloatingTypeImpl.INSTANCE;
     }
 
     @Override

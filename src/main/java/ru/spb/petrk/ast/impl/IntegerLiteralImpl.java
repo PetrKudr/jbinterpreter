@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.IntegerLiteral;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -26,6 +27,11 @@ public class IntegerLiteralImpl extends LeftRightOffsetableASTBase implements In
     @Override
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public Type getType() {
+        return IntegerTypeImpl.INSTANCE;
     }
 
     @Override

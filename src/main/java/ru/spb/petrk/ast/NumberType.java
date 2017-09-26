@@ -6,11 +6,10 @@
 package ru.spb.petrk.ast;
 
 /**
- * Represents an AST node that corresponds to the expression rule in the language.
- * 
+ * Represents any number type.
+ *
  * @author petrk
  */
-public interface Expr extends AST {
-    
-    Type getType();
+public interface NumberType extends Type {
+    // marker interface
 }

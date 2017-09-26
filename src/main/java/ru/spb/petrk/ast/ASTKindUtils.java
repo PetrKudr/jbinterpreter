@@ -74,4 +74,24 @@ public final class ASTKindUtils {
     public static boolean isProgramStmt(AST ast) {
         return ast instanceof ProgramStmt;
     }
+    
+    public static boolean isNumberType(Type type) {
+        return isIntegerType(type) || isFloatingType(type);
+    }
+    
+    public static boolean isIntegerType(Type type) {
+        return type instanceof IntegerType;
+    }
+    
+    public static boolean isFloatingType(Type type) {
+        return type instanceof FloatingType;
+    }
+    
+    public static boolean isStringType(Type type) {
+        return type instanceof StringType;
+    }
+    
+    public static boolean isSequenceType(Type type) {
+        return type instanceof SequenceType;
+    }
 }

@@ -236,8 +236,8 @@ public final class ASTInterpreter implements Interpreter {
             Value neutral = eval(op.getNeutralValue());
             Value reduced = seq.stream().parallel().reduce(neutral, (left, right)-> {
                 Map<String, Value> lambdaSymTab = new HashMap(2);
-                lambdaSymTab.put(op.getLambda().getParams().get(0), left);
-                lambdaSymTab.put(op.getLambda().getParams().get(1), right);
+                lambdaSymTab.put(op.getLambda().getParams().get(0).getName(), left);
+                lambdaSymTab.put(op.getLambda().getParams().get(1).getName(), right);
                 return new ASTInterpreter().interpret(
                         op.getLambda().getBody(), 
                         lambdaSymTab

@@ -10,6 +10,7 @@ import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.StringLiteral;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -27,6 +28,11 @@ public class StringLiteralImpl extends LeftRightOffsetableASTBase implements Str
     @Override
     public String getString() {
         return string;
+    }
+
+    @Override
+    public Type getType() {
+        return StringTypeImpl.INSTANCE;
     }
 
     @Override

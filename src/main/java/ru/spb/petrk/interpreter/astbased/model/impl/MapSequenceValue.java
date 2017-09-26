@@ -63,7 +63,7 @@ public final class MapSequenceValue implements SequenceValue {
     
     private Map<String, Value> symTabOf(Value val) {
         final Map<String, Value> symTab = new HashMap<>(1);
-        symTab.put(lambda.getParams().get(0), val);
+        symTab.put(lambda.getParams().get(0).getName(), val);
         return symTab;
     }
 }

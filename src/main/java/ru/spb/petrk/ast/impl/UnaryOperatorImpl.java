@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
-import ru.spb.petrk.ast.Stmt;
+import ru.spb.petrk.ast.Type;
 import ru.spb.petrk.ast.UnaryOperator;
 
 /**
@@ -36,6 +36,11 @@ public class UnaryOperatorImpl extends LeftOffsetableASTBase implements UnaryOpe
     @Override
     public Expr getExpr() {
         return expr;
+    }
+
+    @Override
+    public Type getType() {
+        return expr.getType();
     }
 
     @Override

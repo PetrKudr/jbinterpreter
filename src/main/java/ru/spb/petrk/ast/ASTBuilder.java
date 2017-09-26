@@ -5,27 +5,35 @@
  */
 package ru.spb.petrk.ast;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.MultiplicativeExprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.PowerExprContext;
+import ru.spb.petrk.antlr4.JetBrainsLanguageParser.ReduceLambdaContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser.UnaryExprContext;
 import ru.spb.petrk.antlr4.JetBrainsLanguageVisitor;
 import ru.spb.petrk.ast.AST.Position;
+import static ru.spb.petrk.ast.ASTKindUtils.*;
 import ru.spb.petrk.ast.BinaryOperator.OpKind;
 import ru.spb.petrk.ast.impl.BinaryOperatorImpl;
 import ru.spb.petrk.ast.impl.FloatingLiteralImpl;
+import ru.spb.petrk.ast.impl.FloatingTypeImpl;
 import ru.spb.petrk.ast.impl.IntegerLiteralImpl;
+import ru.spb.petrk.ast.impl.IntegerTypeImpl;
 import ru.spb.petrk.ast.impl.LambdaExprImpl;
 import ru.spb.petrk.ast.impl.MapOperatorImpl;
 import ru.spb.petrk.ast.impl.OutStmtImpl;
+import ru.spb.petrk.ast.impl.ParamExprImpl;
 import ru.spb.petrk.ast.impl.PositionImpl;
 import ru.spb.petrk.ast.impl.PrintStmtImpl;
 import ru.spb.petrk.ast.impl.ProgramStmtImpl;
@@ -41,13 +49,20 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
  * @author petrk
  */
 /*package*/ class ASTBuilder extends AbstractParseTreeVisitor<AST> implements JetBrainsLanguageVisitor<AST> {
+    
+    private final Deque<Map<String, Type>> symTab = new ArrayDeque<>();
 
     @Override
     public ProgramStmt visitProgram(JetBrainsLanguageParser.ProgramContext ctx) {
-        List<Stmt> statements = ctx.stmt().stream()
-                .map(stmt -> visitStmt(stmt))
-                .collect(Collectors.toList());
-        return new ProgramStmtImpl(statements);
+        pushSymTab();
+        try {
+            List<Stmt> statements = ctx.stmt().stream()
+                    .map(stmt -> visitStmt(stmt))
+                    .collect(Collectors.toList());
+            return new ProgramStmtImpl(statements);
+        } finally {
+            popSymTab();
+        }
     }
 
     @Override
@@ -65,6 +80,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     public VarDeclStmt visitVarStmt(JetBrainsLanguageParser.VarStmtContext ctx) {
         String name = ctx.IDENTIFIER().getText();
         Expr expr = visitAdditiveExpr(ctx.additiveExpr());
+        putSym(name, expr.getType());
         return new VarDeclStmtImpl(name, expr, tok2StartPos(ctx.LITERAL_VAR()));
     }
 
@@ -103,7 +119,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             }
             MultiplicativeExprContext rhsCtx = (MultiplicativeExprContext) ctx.getChild(i + 1);
             Expr RHS = visitMultiplicativeExpr(rhsCtx);
-            LHS = new BinaryOperatorImpl(opKind, LHS, RHS);
+            LHS = new BinaryOperatorImpl(opKind, LHS, RHS, typeOfBinOp(LHS, RHS));
         }
         return LHS;
     }
@@ -123,7 +139,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             }
             PowerExprContext rhsCtx = (PowerExprContext) ctx.getChild(i + 1);
             Expr RHS = visitPowerExpr(rhsCtx);
-            LHS = new BinaryOperatorImpl(opKind, LHS, RHS);
+            LHS = new BinaryOperatorImpl(opKind, LHS, RHS, typeOfBinOp(LHS, RHS));
         }
         return LHS;
     }
@@ -133,15 +149,12 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         // power operation should be right-associative
         List<UnaryExprContext> unaryExprCtxs = ctx.unaryExpr();
         final int lastCtx = unaryExprCtxs.size() - 1;
-        Expr res = visitUnaryExpr(unaryExprCtxs.get(lastCtx));
+        Expr RHS = visitUnaryExpr(unaryExprCtxs.get(lastCtx));
         for (int i = lastCtx - 1; i >= 0; --i) {
-            res = new BinaryOperatorImpl(
-                    OpKind.POWER, 
-                    visitUnaryExpr(unaryExprCtxs.get(i)), 
-                    res
-            );
+            Expr LHS = visitUnaryExpr(unaryExprCtxs.get(i));
+            RHS = new BinaryOperatorImpl(OpKind.POWER, LHS, RHS, typeOfBinOp(LHS, RHS));
         }
-        return res;
+        return RHS;
     }
 
     @Override
@@ -170,8 +183,17 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
             return visitReduceOperator(ctx.reduceOperator());
         }
         assert ctx.IDENTIFIER() != null;
+        String name = ctx.IDENTIFIER().getText();
+        if (!hasSym(name)) {
+            Token ident = ctx.IDENTIFIER().getSymbol();
+            throw new ASTBuildException(symTabDepth(), null, reportError(
+                    "unresolved variable: \"" + name + "\"", 
+                    ident
+            ));
+        }
         return new RefExprImpl(
-                ctx.IDENTIFIER().getText(), 
+                name, 
+                getSym(name),
                 tok2StartPos(ctx.IDENTIFIER()), 
                 tok2StopPos(ctx.IDENTIFIER())
         );
@@ -199,12 +221,9 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                         stop
                 );
             } catch (NumberFormatException ex) {
-                throw new ASTBuildException(new ASTUtils.ParserError(
+                throw new ASTBuildException(symTabDepth(), null, reportError(
                         "number \""+ ctx.INTEGER_NUMBER().getText() + "\" is too big",
-                        start.getOffset(),
-                        start.getLine(),
-                        start.getColumn(),
-                        ctx.INTEGER_NUMBER().getSymbol().getStopIndex() - start.getOffset() + 1
+                        ctx.INTEGER_NUMBER()
                 ));
             }
         }
@@ -216,21 +235,37 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                     stop
             );
         } catch (NumberFormatException ex) {
-            throw new ASTBuildException(new ASTUtils.ParserError(
+            throw new ASTBuildException(symTabDepth(), null, reportError(
                     "number \"" + ctx.DOUBLE_NUMBER().getText() + "\" is too big",
-                    start.getOffset(),
-                    start.getLine(),
-                    start.getColumn(),
-                    ctx.DOUBLE_NUMBER().getSymbol().getStopIndex() - start.getOffset() + 1
+                    ctx.DOUBLE_NUMBER()
             ));
         }
     }
 
     @Override
     public MapOperator visitMapOperator(JetBrainsLanguageParser.MapOperatorContext ctx) {
+        // parse sequence
+        Expr sequence = visitAdditiveExpr(ctx.additiveExpr());
+        if (!isSequenceType(sequence.getType())) {
+            throw new ASTBuildException(symTabDepth(), sequence, reportMismatchedTypes(
+                    sequence, SequenceType.class
+            ));
+        }
+        
+        // parse lambda
+        LambdaExpr lambda;
+        pushSymTab();
+        String lambdaParam = ctx.mapLambda().IDENTIFIER().getText();
+        putSym(lambdaParam, ((SequenceType) sequence.getType()).getElementType());
+        try {
+            lambda = visitMapLambda(ctx.mapLambda());
+        } finally {
+            popSymTab();
+        }
+        
         return new MapOperatorImpl(
-                visitAdditiveExpr(ctx.additiveExpr()), 
-                visitMapLambda(ctx.mapLambda()),
+                sequence, 
+                lambda,
                 tok2StartPos(ctx.getStart()),
                 tok2StopPos(ctx.getStop())
         );
@@ -238,19 +273,103 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     
     @Override
     public ReduceOperator visitReduceOperator(JetBrainsLanguageParser.ReduceOperatorContext ctx) {
+        // parse sequence
+        Expr sequence = visitAdditiveExpr(ctx.additiveExpr(0));
+        if (!isSequenceType(sequence.getType())) {
+            throw new ASTBuildException(symTabDepth(), sequence, reportMismatchedTypes(
+                    sequence, SequenceType.class
+            ));
+        }
+        SequenceType seqType = (SequenceType) sequence.getType();
+        
+        // parse neutral
+        Expr neutral = visitAdditiveExpr(ctx.additiveExpr(1));
+        
+        // parse lambda
+        LambdaExpr lambda;
+        lambda = visitReduceLambdaStageOne(ctx.reduceLambda(), neutral, seqType.getElementType());
+        lambda = visitReduceLambdaStageTwo(ctx.reduceLambda(), neutral, lambda);
+        
         return new ReduceOperatorImpl(
-                visitAdditiveExpr(ctx.additiveExpr(0)), 
-                visitAdditiveExpr(ctx.additiveExpr(1)),
-                visitReduceLambda(ctx.reduceLambda()),
+                sequence, 
+                neutral,
+                lambda,
                 tok2StartPos(ctx.getStart()),
                 tok2StopPos(ctx.getStop())
         );
     }
+    
+    private LambdaExpr visitReduceLambdaStageOne(ReduceLambdaContext ctx, Expr neutral, Type seqElemType) {
+        // This stage builds lambda of type (x y) -> ...
+        // assuming that 
+        //  - x = neutral
+        //  - y = element of the sequence
+        final String lambdaFirstParam = ctx.IDENTIFIER(0).getText();
+        final String lambdaSecondParam = ctx.IDENTIFIER(1).getText();
+        pushSymTab();
+        putSym(lambdaFirstParam, neutral.getType());
+        putSym(lambdaSecondParam, seqElemType);
+        try {
+            return visitReduceLambda(ctx);
+        } catch (ASTBuildException ex) {
+            if (symTabDepth() == ex.contextDepth && isRefExpr(ex.offendingExpr)) {
+                RefExpr ref = (RefExpr) ex.offendingExpr;
+                if (ref.getName().equals(lambdaFirstParam)) {
+                    throw new ASTBuildException(symTabDepth(), ref, reportError(
+                            "lambda neutral element problem: " + ex.getMessage(), 
+                            ex.error
+                    ));
+                } else if (ref.getName().equals(lambdaSecondParam)) {
+                    throw new ASTBuildException(symTabDepth(), ref, reportError(
+                            "lambda sequence element problem: " + ex.getMessage(), 
+                            ex.error
+                    ));
+                }
+            }
+            throw ex; // just rethrow
+        } finally {
+            popSymTab();
+        }
+    }
+    
+    private LambdaExpr visitReduceLambdaStageTwo(JetBrainsLanguageParser.ReduceLambdaContext ctx, Expr neutral, LambdaExpr lambda) {
+        // This stage builds lambda of type (x y) -> ...
+        // assuming that 
+        //  - x = neutral
+        //  - y = result of applying lambda from stage one
+        final String lambdaFirstParam = ctx.IDENTIFIER(0).getText();
+        final String lambdaSecondParam = ctx.IDENTIFIER(1).getText();
+        pushSymTab();
+        putSym(lambdaFirstParam, neutral.getType());
+        putSym(lambdaSecondParam, lambda.getType());
+        try {
+            return visitReduceLambda(ctx);
+        } catch (ASTBuildException ex) {
+            if (symTabDepth() == ex.contextDepth && isRefExpr(ex.offendingExpr)) {
+                RefExpr ref = (RefExpr) ex.offendingExpr;
+                throw new ASTBuildException(symTabDepth(), ref, reportError(
+                        "lambda is not associative because cannot be applied to its result: " + ex.getMessage(), 
+                        ex.error
+                ));
+            } else {
+                throw ex;
+            }
+        } finally {
+            popSymTab();
+        }
+    }
 
     @Override
     public LambdaExpr visitMapLambda(JetBrainsLanguageParser.MapLambdaContext ctx) {
+        Token ident = ctx.IDENTIFIER().getSymbol();
+        String identName = ident.getText();
         return new LambdaExprImpl(
-                Arrays.asList(ctx.IDENTIFIER().getSymbol().getText()), 
+                Arrays.asList(new ParamExprImpl(
+                        identName, 
+                        getSym(identName), 
+                        tok2StartPos(ident), 
+                        tok2StopPos(ident))
+                ), 
                 visitAdditiveExpr(ctx.additiveExpr()),
                 tok2StartPos(ctx.IDENTIFIER())
         );
@@ -259,19 +378,20 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     @Override
     public LambdaExpr visitReduceLambda(JetBrainsLanguageParser.ReduceLambdaContext ctx) {
         Position start = tok2StartPos(ctx.getStart());
-        assert ctx.IDENTIFIER().size() == 2 : "Reduce lambda with more than 2 parameters?";
         if (ctx.IDENTIFIER(0).getText().equals(ctx.IDENTIFIER(1).getText())) {
-            throw new ASTBuildException(new ASTUtils.ParserError(
+            throw new ASTBuildException(symTabDepth(), null, reportError(
                     "parameters of the lambda cannot have the same name",
-                    start.getOffset(),
-                    start.getLine(),
-                    start.getColumn(),
+                    ctx.IDENTIFIER(0),
                     ctx.IDENTIFIER(1).getSymbol().getStopIndex() - start.getOffset() + 1
             ));
         }
         return new LambdaExprImpl(
                 ctx.IDENTIFIER().stream()
-                        .map(id -> id.getText())
+                        .map(id -> new ParamExprImpl(
+                                id.getText(),
+                                getSym(id.getText()),
+                                tok2StartPos(id), 
+                                tok2StopPos(id)))
                         .collect(Collectors.toList()), 
                 visitAdditiveExpr(ctx.additiveExpr()),
                 start
@@ -313,11 +433,109 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         return new PositionImpl(offset, line, column);
     }
     
+    private Type typeOfBinOp(Expr lhs, Expr rhs) {
+        if (isNumberType(lhs.getType()) && isNumberType(rhs.getType())) {
+            if (isIntegerType(lhs.getType()) && isIntegerType(rhs.getType())) {
+                return IntegerTypeImpl.INSTANCE;
+            }
+            assert isFloatingType(lhs.getType()) || isFloatingType(rhs.getType());
+            return FloatingTypeImpl.INSTANCE;
+        }
+        Expr notANumber = !isNumberType(lhs.getType()) ? lhs : rhs;
+        throw new ASTBuildException(symTabDepth(), notANumber, reportMismatchedTypes(notANumber, NumberType.class));
+    }
+    
+    private ASTUtils.ParserError reportMismatchedTypes(Expr expr, Class<? extends Type> expected) {
+        return reportError(
+                    "mismatched types: " 
+                        + "expected \"" + ASTUtils.getTypeClassName(expected) + "\"," 
+                        + " but found \"" + ASTUtils.getTypeName(expr.getType()) + "\"", 
+                    expr
+        );
+    }
+    
+    private ASTUtils.ParserError reportError(String message, AST ast) {
+        return new ASTUtils.ParserError(
+                    message, 
+                    ast.getStart().getOffset(), 
+                    ast.getStart().getLine(),
+                    ast.getStart().getColumn(), 
+                    ast.getStop().getOffset() - ast.getStart().getOffset() + 1
+        );
+    }
+    
+    private ASTUtils.ParserError reportError(String message, Token token) {
+        return reportError(
+                    message, 
+                    token,
+                    token.getStopIndex() - token.getStartIndex() + 1
+        );
+    }
+    
+    private ASTUtils.ParserError reportError(String message, Token token, int length) {
+        return new ASTUtils.ParserError(
+                    message, 
+                    token.getStartIndex(), 
+                    token.getLine(),
+                    token.getCharPositionInLine(), 
+                    length
+        );
+    }
+    
+    private ASTUtils.ParserError reportError(String message, TerminalNode node) {
+        return reportError(message, node.getSymbol());
+    }
+    
+    private ASTUtils.ParserError reportError(String message, TerminalNode node, int length) {
+        return reportError(message, node.getSymbol(), length);
+    }
+    
+    private ASTUtils.ParserError reportError(String newMessage, ASTUtils.ParserError error) {
+        return new ASTUtils.ParserError(
+                    newMessage, 
+                    error.offendingStartOffset, 
+                    error.offendingStartLine,
+                    error.offendingStartColumn, 
+                    error.offendingLength
+        );
+    }
+    
+    private void pushSymTab() {
+        symTab.push(new HashMap<>());
+    }
+    
+    private void popSymTab() {
+        symTab.pop();
+    }
+    
+    private Type getSym(String name) {
+        return symTab.peek().get(name);
+    }
+    
+    private boolean hasSym(String name) {
+        return symTab.peek().containsKey(name);
+    }
+    
+    private void putSym(String name, Type type) {
+        symTab.peek().put(name, type);
+    }
+    
+    private int symTabDepth() {
+        return symTab.size();
+    }
+    
     public static class ASTBuildException extends RuntimeException {
+        
+        public final int contextDepth; // depth of symtab
+        
+        public final Expr offendingExpr; // may be null
         
         public final ASTUtils.ParserError error;
 
-        public ASTBuildException(ASTUtils.ParserError error) {
+        public ASTBuildException(int contextDepth, Expr expr, ASTUtils.ParserError error) {
+            super(error.message);
+            this.contextDepth = contextDepth;
+            this.offendingExpr = expr;
             this.error = error;
         }
     }

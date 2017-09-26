@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
+import static ru.spb.petrk.ast.ASTKindUtils.isSequenceType;
 
 /**
  *
@@ -77,6 +78,34 @@ public final class ASTUtils {
             ast = null;
         }
         return ast;
+    }
+    
+    public static String getTypeClassName(Class<? extends Type> cls) {
+        if (IntegerType.class.isAssignableFrom(cls)) {
+            return "Integer";
+        } else if (FloatingType.class.isAssignableFrom(cls)) {
+            return "Float";
+        } else if (NumberType.class.isAssignableFrom(cls)) {
+            return "Number";
+        } else if (SequenceType.class.isAssignableFrom(cls)) {
+            return "Sequence";
+        } else if (Type.class.isAssignableFrom(cls)) {
+            return "Type";
+        }
+        throw new AssertionError("Unexpected type class: " + cls);
+    }
+    
+    public static String getTypeName(Type type) {
+        if (isSequenceType(type)) {
+            Type curType = type;
+            StringBuilder name = new StringBuilder(getTypeClassName(curType.getClass()));
+            while (isSequenceType(curType)) {
+                curType = ((SequenceType) curType).getElementType();
+                name.append(" of ").append(getTypeClassName(curType.getClass()));
+            }
+            return name.toString();
+        }
+        return getTypeClassName(type.getClass());
     }
     
     public static String position(AST ast) {

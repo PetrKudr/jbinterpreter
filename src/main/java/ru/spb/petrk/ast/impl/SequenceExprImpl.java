@@ -10,7 +10,7 @@ import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.SequenceExpr;
-import ru.spb.petrk.ast.Stmt;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -36,6 +36,11 @@ public class SequenceExprImpl extends LeftRightOffsetableASTBase implements Sequ
     @Override
     public Expr getRHS() {
         return RHS;
+    }
+
+    @Override
+    public Type getType() {
+        return new SequenceTypeImpl(IntegerTypeImpl.INSTANCE);
     }
 
     @Override

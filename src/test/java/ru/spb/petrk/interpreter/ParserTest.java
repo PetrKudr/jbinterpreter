@@ -7,6 +7,7 @@ package ru.spb.petrk.interpreter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
 import ru.spb.petrk.ast.AST;
@@ -292,7 +293,11 @@ public class ParserTest {
         } else if (ASTKindUtils.isIntegerLiteral(ast)) {
             sb.append(((IntegerLiteral) ast).getValue());
         } else if (ASTKindUtils.isLambdaExpr(ast)) {
-            sb.append(((LambdaExpr) ast).getParams());
+            sb.append(
+                    ((LambdaExpr) ast).getParams().stream()
+                            .map(param -> param.getName())
+                            .collect(Collectors.toList())
+            );
         } else if (ASTKindUtils.isRefExpr(ast)) {
             sb.append(((RefExpr) ast).getName());
         } else if (ASTKindUtils.isStringLiteral(ast)) {

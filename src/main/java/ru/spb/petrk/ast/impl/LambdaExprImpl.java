@@ -11,6 +11,8 @@ import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
+import ru.spb.petrk.ast.ParamExpr;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -18,24 +20,29 @@ import ru.spb.petrk.ast.LambdaExpr;
  */
 public class LambdaExprImpl extends LeftOffsetableASTBase implements LambdaExpr {
     
-    private final List<String> parameters;
+    private final List<ParamExpr> parameters;
     
     private final Expr body;
 
-    public LambdaExprImpl(List<String> parameters, Expr body, Position left) {
+    public LambdaExprImpl(List<ParamExpr> parameters, Expr body, Position left) {
         super(left);
         this.parameters = Collections.unmodifiableList(parameters);
         this.body = body;
     }
 
     @Override
-    public List<String> getParams() {
+    public List<ParamExpr> getParams() {
         return parameters;
     }
 
     @Override
     public Expr getBody() {
         return body;
+    }
+
+    @Override
+    public Type getType() {
+        return body.getType();
     }
 
     @Override

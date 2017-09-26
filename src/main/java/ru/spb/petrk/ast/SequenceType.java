@@ -6,11 +6,11 @@
 package ru.spb.petrk.ast;
 
 /**
- * Represents an AST node that corresponds to the expression rule in the language.
- * 
+ * Represents type of sequence.
+ *
  * @author petrk
  */
-public interface Expr extends AST {
+public interface SequenceType extends Type {
     
-    Type getType();
+    Type getElementType();
 }

@@ -6,11 +6,13 @@
 package ru.spb.petrk.ast;
 
 /**
- * Represents an AST node that corresponds to the expression rule in the language.
- * 
+ * Represents string type.
+ *
  * @author petrk
  */
-public interface Expr extends AST {
+public interface StringType extends Type {
     
-    Type getType();
+    public static String thisTypeName() {
+        return "String";
+    }
 }

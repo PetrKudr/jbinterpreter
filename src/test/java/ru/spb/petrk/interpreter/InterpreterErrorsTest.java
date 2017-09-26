@@ -31,23 +31,23 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testBinaryOperationWithSequence() throws Exception {
         assertEquals(
-                "line 1:9 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:9 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out 1 + {1, 2}")
         );        
         assertEquals(
-                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out {1, 2} - 1")
         );  
         assertEquals(
-                "line 1:9 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:9 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out 1 * {1, 2}")
         );        
         assertEquals(
-                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out {1, 2} / 1")
         );  
         assertEquals(
-                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:5 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out {1, 2} ^ 1")
         ); 
     }
@@ -79,7 +79,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testReduceWithWrongNeutral() throws Exception {
         assertEquals(
-                "line 1:35 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:35 lambda neutral element problem: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out reduce({0, 1}, {0, 0}, x y -> x + 1)")
         );        
     }

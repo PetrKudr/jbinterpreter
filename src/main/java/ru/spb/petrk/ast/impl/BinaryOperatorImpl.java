@@ -10,6 +10,7 @@ import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.Expr;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -22,11 +23,14 @@ public class BinaryOperatorImpl implements BinaryOperator {
     private final Expr LHS;
     
     private final Expr RHS;
+    
+    private final Type type;
 
-    public BinaryOperatorImpl(OpKind kind, Expr LHS, Expr RHS) {
+    public BinaryOperatorImpl(OpKind kind, Expr LHS, Expr RHS, Type type) {
         this.kind = kind;
         this.LHS = LHS;
         this.RHS = RHS;
+        this.type = type;
     }    
 
     @Override
@@ -57,5 +61,10 @@ public class BinaryOperatorImpl implements BinaryOperator {
     @Override
     public Position getStop() {
         return RHS.getStop();
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

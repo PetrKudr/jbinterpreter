@@ -8,21 +8,20 @@ package ru.spb.petrk.ast.impl;
 import java.util.Collections;
 import java.util.List;
 import ru.spb.petrk.ast.AST;
-import ru.spb.petrk.ast.RefExpr;
-import ru.spb.petrk.ast.Stmt;
+import ru.spb.petrk.ast.ParamExpr;
 import ru.spb.petrk.ast.Type;
 
 /**
  *
  * @author petrk
  */
-public class RefExprImpl extends LeftRightOffsetableASTBase implements RefExpr {
+public final class ParamExprImpl extends LeftRightOffsetableASTBase implements ParamExpr {
     
     private final String name;
     
     private final Type type;
 
-    public RefExprImpl(String name, Type type, Position left, Position right) {
+    public ParamExprImpl(String name, Type type, Position left, Position right) {
         super(left, right);
         this.name = name;
         this.type = type;
@@ -37,7 +36,7 @@ public class RefExprImpl extends LeftRightOffsetableASTBase implements RefExpr {
     public Type getType() {
         return type;
     }
-
+    
     @Override
     public List<AST> getChildren() {
         return Collections.emptyList();

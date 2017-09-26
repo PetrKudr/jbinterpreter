@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface LambdaExpr extends Expr {
     
-    List<String> getParams();
+    List<ParamExpr> getParams();
     
     Expr getBody();
 }
