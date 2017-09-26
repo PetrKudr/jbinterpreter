@@ -56,6 +56,52 @@ public class InterpreterTest extends TestCase {
     }
     
     @Test
+    public void testOperatorsPrecedence() throws Exception {
+        String expected = "2.999";
+        String interpreted = interpret("out 1 + 2 - 3 * 4 / 5.0 ^ 6");
+        assertTrue(interpreted.startsWith(expected));
+        expected = "127.0";
+        interpreted = interpret("out 4.0 ^ 3 * 2 + 5 / 1 - 6");
+        assertTrue(interpreted.startsWith(expected));
+    }
+    
+    @Test
+    public void testSequences() throws Exception {
+        assertEquals(
+                "[0, 1, 2]",
+                interpret("out {0, 2}")
+        );
+        assertEquals(
+                "[[1], [1, 2], [1, 2, 3]]",
+                interpret("out map({1, 3}, x -> {1, x})")
+        );
+    }
+    
+    @Test
+    public void testReduceOperator() throws Exception {
+        assertEquals(
+                "3",
+                interpret("out reduce({1, 2}, 0, a b -> a + b)")
+        );
+        assertEquals(
+                "6",
+                interpret("out reduce(map({1, 2}, elem -> elem * 2), 0, a b -> a + b)")
+        );
+    }
+    
+    @Test
+    public void testSeveralStatements() throws Exception {
+        assertEquals(
+                "a = 1", 
+                interpret(
+                        "var a = 1\n" +
+                        "print \"a = \"\n" +
+                        "out a"
+                )
+        );
+    }
+    
+    @Test
     public void testSequenceOfSequences() throws Exception {
         assertEquals(
                 "Sum([[1], [1, 2], [1, 2, 3]]) = 10",
