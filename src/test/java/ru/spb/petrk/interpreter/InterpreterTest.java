@@ -56,6 +56,30 @@ public class InterpreterTest extends TestCase {
     }
     
     @Test
+    public void testFractionalPowerOperator() throws Exception {
+        assertEquals(
+                "4.0",
+                interpret("out 16 ^ (1.0 / 2)")
+        );
+        assertEquals(
+                "3.0",
+                interpret("out 27 ^ (1.0 / 3)")
+        );
+    }
+    
+    @Test
+    public void testNegativePowerOperator() throws Exception {
+        assertEquals(
+                "2.0",
+                interpret("out 0.5 ^ -1")
+        );
+        assertEquals(
+                "4.0",
+                interpret("out (1 / 2.0) ^ -2")
+        );
+    }
+    
+    @Test
     public void testOperatorsPrecedence() throws Exception {
         String expected = "2.999";
         String interpreted = interpret("out 1 + 2 - 3 * 4 / 5.0 ^ 6");
