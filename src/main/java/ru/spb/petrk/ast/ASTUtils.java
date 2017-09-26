@@ -108,6 +108,12 @@ public final class ASTUtils {
         return getTypeClassName(type.getClass());
     }
     
+    public static String getGeneralizedTypeName(Type type) {
+        return getTypeName(type)
+                .replaceAll(getTypeClassName(IntegerType.class), getTypeClassName(NumberType.class))
+                .replaceAll(getTypeClassName(FloatingType.class), getTypeClassName(NumberType.class));
+    }
+    
     public static String position(AST ast) {
         return position(ast.getStart().getLine(), ast.getStart().getColumn());
     }

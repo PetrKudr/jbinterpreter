@@ -5,7 +5,10 @@
  */
 package ru.spb.petrk.ast.impl;
 
+import static ru.spb.petrk.ast.ASTKindUtils.isFloatingType;
+import static ru.spb.petrk.ast.ASTKindUtils.isIntegerType;
 import ru.spb.petrk.ast.FloatingType;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -16,4 +19,9 @@ public final class FloatingTypeImpl implements FloatingType {
     public final static FloatingTypeImpl INSTANCE = new FloatingTypeImpl();
     
     private FloatingTypeImpl() {}
+
+    @Override
+    public boolean isConvertibleTo(Type other) {
+        return isIntegerType(other) || isFloatingType(other);
+    }
 }

@@ -5,7 +5,9 @@
  */
 package ru.spb.petrk.ast.impl;
 
+import static ru.spb.petrk.ast.ASTKindUtils.isStringType;
 import ru.spb.petrk.ast.StringType;
+import ru.spb.petrk.ast.Type;
 
 /**
  *
@@ -16,4 +18,9 @@ public final class StringTypeImpl implements StringType {
     public final static StringTypeImpl INSTANCE = new StringTypeImpl();
     
     private StringTypeImpl() {}
+    
+    @Override
+    public boolean isConvertibleTo(Type other) {
+        return isStringType(other);
+    }
 }

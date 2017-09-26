@@ -79,7 +79,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testReduceWithWrongNeutral() throws Exception {
         assertEquals(
-                "line 1:35 lambda neutral element problem: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                "line 1:35 error when \"x\" is the neutral element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out reduce({0, 1}, {0, 0}, x y -> x + 1)")
         );        
     }
@@ -107,6 +107,41 @@ public class InterpreterErrorsTest extends TestCase {
                 interpret(
                         "var a = 1\n" +
                         "var a = 2"
+                )
+        );        
+    }
+    
+    @Test
+    public void testReduceNumberPlusSequence() throws Exception {
+        assertEquals(
+                "line 2:33 error when \"b\" is a sequence element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                interpret(
+                        "var aux = map({1, 2}, x -> {1, x})\n" +
+                        "out reduce(aux, 1.0, a b -> a + b)"
+                )
+        );        
+    }
+    
+    @Test
+    public void testReduceSequencePlusNumber() throws Exception {
+        assertEquals(
+                "line 2:32 error when \"a\" is the neutral element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                interpret(
+                        "var aux = {1, 2}\n" +
+                        "out reduce(aux, {1, 1}, a b -> a + b)"
+                )
+        );        
+    }
+    
+    @Test
+    public void testReduceNeutralAndElemGivesWrongType() throws Exception {
+        assertEquals(
+                "line 2:25 if \"a\" is the neutral element (\"Sequence of Integer\") " + 
+                "and \"b\" is a sequence element (\"Sequence of Integer\"), then reduction " + 
+                "has \"Integer\" type, but \"Sequence of Number\" type expected\n",
+                interpret(
+                        "var aux = map({1, 2}, x -> {1, x})\n" +
+                        "out reduce(aux, {1, 1}, a b -> reduce(a, 0, x y -> x + y) + reduce(b, 0, x y -> x + y))"
                 )
         );        
     }

@@ -11,5 +11,12 @@ package ru.spb.petrk.ast;
  * @author petrk
  */
 public interface Type {
-    // marker interface
+    
+    /**
+     * Checks that this type can be implicitly converted to the given type.
+     * 
+     * @param other type
+     * @return true if convertible, false otherwise
+     */
+    boolean isConvertibleTo(Type other);
 }

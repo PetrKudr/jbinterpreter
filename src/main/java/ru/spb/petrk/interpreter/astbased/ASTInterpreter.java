@@ -23,17 +23,22 @@ import static ru.spb.petrk.ast.ASTUtils.position;
 import ru.spb.petrk.ast.ASTVisitor;
 import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.FloatingLiteral;
+import ru.spb.petrk.ast.FloatingType;
 import ru.spb.petrk.ast.IntegerLiteral;
+import ru.spb.petrk.ast.IntegerType;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.MapOperator;
+import ru.spb.petrk.ast.NumberType;
 import ru.spb.petrk.ast.OutStmt;
 import ru.spb.petrk.ast.PrintStmt;
 import ru.spb.petrk.ast.ProgramStmt;
 import ru.spb.petrk.ast.ReduceOperator;
 import ru.spb.petrk.ast.RefExpr;
 import ru.spb.petrk.ast.SequenceExpr;
+import ru.spb.petrk.ast.SequenceType;
 import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.StringLiteral;
+import ru.spb.petrk.ast.StringType;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
 import ru.spb.petrk.interpreter.InterpreterError;
@@ -346,15 +351,15 @@ public final class ASTInterpreter implements Interpreter {
         
         private static String getValueType(Class<? extends Value> cls) {
             if (IntValue.class.isAssignableFrom(cls)) {
-                return "Integer";
+                return ASTUtils.getTypeClassName(IntegerType.class);
             } else if (FloatingValue.class.isAssignableFrom(cls)) {
-                return "Float";
+                return ASTUtils.getTypeClassName(FloatingType.class);
             } else if (StringValue.class.isAssignableFrom(cls)) {
-                return "String";
+                return ASTUtils.getTypeClassName(StringType.class);
             } else if (SequenceValue.class.isAssignableFrom(cls)) {
-                return "Sequence";
+                return ASTUtils.getTypeClassName(SequenceType.class);
             } else if (NumberValue.class.isAssignableFrom(cls)) {
-                return "Number";
+                return ASTUtils.getTypeClassName(NumberType.class);
             } else if (VoidValue.class.isAssignableFrom(cls)) {
                 return "Void";
             }

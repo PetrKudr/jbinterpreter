@@ -173,6 +173,7 @@ public class JInterpreter extends javax.swing.JFrame {
         outputArea.setBackground(new java.awt.Color(206, 196, 187));
         outputArea.setColumns(20);
         outputArea.setForeground(new java.awt.Color(40, 40, 40));
+        outputArea.setLineWrap(true);
         outputArea.setRows(5);
         jScrollPane4.setViewportView(outputArea);
 
