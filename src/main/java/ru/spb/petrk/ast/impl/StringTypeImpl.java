@@ -20,7 +20,7 @@ public final class StringTypeImpl implements StringType {
     private StringTypeImpl() {}
     
     @Override
-    public boolean isConvertibleTo(Type other) {
+    public boolean isCompatibleWith(Type other) {
         return isStringType(other);
     }
 }

@@ -79,7 +79,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testReduceWithWrongNeutral() throws Exception {
         assertEquals(
-                "line 1:35 error when \"x\" is the neutral element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                "line 1:20 the type of neutral element differs from the type of sequence elements: expected \"Number\", but found \"Sequence of Number\"\n",
                 interpret("out reduce({0, 1}, {0, 0}, x y -> x + 1)")
         );        
     }
@@ -114,7 +114,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testReduceNumberPlusSequence() throws Exception {
         assertEquals(
-                "line 2:33 error when \"b\" is a sequence element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                "line 2:17 the type of neutral element differs from the type of sequence elements: expected \"Sequence of Number\", but found \"Number\"\n",
                 interpret(
                         "var aux = map({1, 2}, x -> {1, x})\n" +
                         "out reduce(aux, 1.0, a b -> a + b)"
@@ -125,7 +125,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testReduceSequencePlusNumber() throws Exception {
         assertEquals(
-                "line 2:32 error when \"a\" is the neutral element: mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
+                "line 2:17 the type of neutral element differs from the type of sequence elements: expected \"Number\", but found \"Sequence of Number\"\n",
                 interpret(
                         "var aux = {1, 2}\n" +
                         "out reduce(aux, {1, 1}, a b -> a + b)"

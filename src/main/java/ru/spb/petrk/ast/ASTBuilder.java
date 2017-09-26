@@ -280,13 +280,12 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
                     sequence, SequenceType.class
             ));
         }
-        SequenceType seqType = (SequenceType) sequence.getType();
         
         // parse neutral
         Expr neutral = visitAdditiveExpr(ctx.additiveExpr(1));
         
         // parse lambda
-        LambdaExpr lambda = visitReduceLambda(ctx.reduceLambda(), neutral, seqType.getElementType());
+        LambdaExpr lambda = visitReduceLambda(ctx.reduceLambda(), neutral, sequence);
         
         return new ReduceOperatorImpl(
                 sequence, 
@@ -297,7 +296,29 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         );
     }
     
-    private LambdaExpr visitReduceLambda(ReduceLambdaContext ctx, Expr neutral, Type seqElemType) {
+    private LambdaExpr visitReduceLambda(ReduceLambdaContext ctx, Expr neutral, Expr sequence) {
+        // Basically, we need to check that lambda has type of "(T a, T b) -> T"
+        
+        // Check that sequence has sequence type
+        if (!isSequenceType(sequence.getType())) {
+            throw new ASTBuildException(symTabDepth(), sequence, reportMismatchedTypes(
+                    sequence, SequenceType.class
+            ));
+        }        
+        SequenceType seqType = (SequenceType) sequence.getType();
+        Type seqElemType = seqType.getElementType();
+        
+        // Check that identity element has compatible type with seqElemType
+        if (!neutral.getType().isCompatibleWith(seqElemType)) {
+            throw new ASTBuildException(symTabDepth(), neutral, reportError(
+                    "the type of neutral element differs from the type of sequence elements: "
+                    + "expected \"" + ASTUtils.getGeneralizedTypeName(seqElemType) + "\", "
+                    + "but found \"" + ASTUtils.getGeneralizedTypeName(neutral.getType()) + "\"",
+                    neutral
+            ));
+        }
+        Type neutralType = neutral.getType();
+        
         // Let's build lambda of type (x y) -> ...
         // assuming that 
         //  - x = neutral
@@ -305,38 +326,38 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         final String lambdaFirstParam = ctx.IDENTIFIER(0).getText();
         final String lambdaSecondParam = ctx.IDENTIFIER(1).getText();
         pushSymTab();
-        putSym(lambdaFirstParam, neutral.getType());
+        putSym(lambdaFirstParam, neutralType);
         putSym(lambdaSecondParam, seqElemType);
         LambdaExpr lambda;
         try {
             lambda = visitReduceLambda(ctx);
         } catch (ASTBuildException ex) {
-            if (symTabDepth() == ex.contextDepth && isRefExpr(ex.offendingExpr)) {
-                RefExpr ref = (RefExpr) ex.offendingExpr;
-                if (ref.getName().equals(lambdaFirstParam)) {
-                    throw new ASTBuildException(symTabDepth(), ref, reportError(
-                            "error when \"" + lambdaFirstParam + "\" is the neutral element: " + ex.getMessage(), 
-                            ex.error
-                    ));
-                } else if (ref.getName().equals(lambdaSecondParam)) {
-                    throw new ASTBuildException(symTabDepth(), ref, reportError(
-                            "error when \"" + lambdaSecondParam + "\" is a sequence element: " + ex.getMessage(), 
-                            ex.error
-                    ));
-                }
-            }
+            //if (symTabDepth() == ex.contextDepth && isRefExpr(ex.offendingExpr)) {
+            //    RefExpr ref = (RefExpr) ex.offendingExpr;
+            //    if (ref.getName().equals(lambdaFirstParam)) {
+            //        throw new ASTBuildException(symTabDepth(), ref, reportError(
+            //                "error when \"" + lambdaFirstParam + "\" is the neutral element: " + ex.getMessage(), 
+            //                ex.error
+            //        ));
+            //    } else if (ref.getName().equals(lambdaSecondParam)) {
+            //        throw new ASTBuildException(symTabDepth(), ref, reportError(
+            //                "error when \"" + lambdaSecondParam + "\" is a sequence element: " + ex.getMessage(), 
+            //                ex.error
+            //        ));
+            //    }
+            //}
             throw ex; // just rethrow
         } finally {
             popSymTab();
         }
-        // Check that applying lambda to the identity element and a sequence element
-        // gives us sequence element type.
-        if (!lambda.getType().isConvertibleTo(seqElemType)) {
+        
+        // Check that lambda returns type compatible with sequence element type
+        if (!lambda.getType().isCompatibleWith(seqElemType)) {
             ParamExpr firstParm = lambda.getParams().get(0);
             ParamExpr lastParm = lambda.getParams().get(1);
             throw new ASTBuildException(symTabDepth(), lambda, reportError(
                     "if \"" + lambdaFirstParam + "\" is the neutral element "
-                            + "(\"" + ASTUtils.getTypeName(neutral.getType()) + "\") and "
+                            + "(\"" + ASTUtils.getTypeName(neutralType) + "\") and "
                             + "\"" + lambdaSecondParam + "\" is a sequence element "
                             + "(\"" + ASTUtils.getTypeName(seqElemType) + "\"), "
                             + "then reduction has "

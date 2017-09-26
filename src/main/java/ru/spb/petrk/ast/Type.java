@@ -13,10 +13,10 @@ package ru.spb.petrk.ast;
 public interface Type {
     
     /**
-     * Checks that this type can be implicitly converted to the given type.
+     * Checks that this type can be implicitly converted to the given type and from it.
      * 
      * @param other type
-     * @return true if convertible, false otherwise
+     * @return true if compatible, false otherwise
      */
-    boolean isConvertibleTo(Type other);
+    boolean isCompatibleWith(Type other);
 }

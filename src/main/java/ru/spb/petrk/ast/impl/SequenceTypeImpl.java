@@ -29,8 +29,8 @@ public final class SequenceTypeImpl implements SequenceType {
     }
 
     @Override
-    public boolean isConvertibleTo(Type other) {
+    public boolean isCompatibleWith(Type other) {
         return isSequenceType(other)
-                && elemType.isConvertibleTo(((SequenceType) other).getElementType());
+                && elemType.isCompatibleWith(((SequenceType) other).getElementType());
     }
 }

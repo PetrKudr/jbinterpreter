@@ -21,7 +21,7 @@ public final class IntegerTypeImpl implements IntegerType {
     private IntegerTypeImpl() {}
 
     @Override
-    public boolean isConvertibleTo(Type other) {
+    public boolean isCompatibleWith(Type other) {
         return isIntegerType(other) || isFloatingType(other);
     }
 }
