@@ -8,17 +8,7 @@ package ru.spb.petrk.interpreter;
 import java.util.ArrayList;
 import java.util.List;
 import static junit.framework.TestCase.assertEquals;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Test;
-import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
-import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ASTKindUtils;
 import ru.spb.petrk.ast.ASTUtils;
@@ -28,17 +18,35 @@ import ru.spb.petrk.ast.IntegerLiteral;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.ProgramStmt;
 import ru.spb.petrk.ast.RefExpr;
-import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.StringLiteral;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
-import ru.spb.petrk.interpreter.LexerTest.AccumulatingErrorsListener;
 
 /**
  *
  * @author petrk
  */
 public class ParserTest {
+    
+    @Test
+    public void testOutStatement() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    IntegerLiteral 1\n",
+                parse("out 1")
+        );
+    }
+    
+    @Test
+    public void testPrintStatement() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  PrintStmt \n" +
+                "    StringLiteral \"Hello, World!\"\n",
+                parse("print \"Hello, World!\"")
+        );
+    }
     
     @Test
     public void testVarDeclaration() throws Exception {
@@ -65,6 +73,122 @@ public class ParserTest {
                 "            IntegerLiteral 1\n" +
                 "          RefExpr i\n",
                 parse("out map({0, 10}, i -> (-1)^i)")
+        );
+    }
+    
+    @Test
+    public void testOperatorsPrecedence() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    BinaryOperator -\n" +
+                "      BinaryOperator +\n" +
+                "        IntegerLiteral 1\n" +
+                "        IntegerLiteral 2\n" +
+                "      BinaryOperator /\n" +
+                "        BinaryOperator *\n" +
+                "          IntegerLiteral 3\n" +
+                "          IntegerLiteral 4\n" +
+                "        BinaryOperator ^\n" +
+                "          FloatingLiteral 5.0\n" +
+                "          IntegerLiteral 6\n",
+                parse("out 1 + 2 - 3 * 4 / 5.0 ^ 6")
+        );
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    BinaryOperator -\n" +
+                "      BinaryOperator +\n" +
+                "        BinaryOperator *\n" +
+                "          BinaryOperator ^\n" +
+                "            FloatingLiteral 4.0\n" +
+                "            IntegerLiteral 3\n" +
+                "          IntegerLiteral 2\n" +
+                "        BinaryOperator /\n" +
+                "          IntegerLiteral 5\n" +
+                "          IntegerLiteral 1\n" +
+                "      IntegerLiteral 6\n",
+                parse("out 4.0 ^ 3 * 2 + 5 / 1 - 6")
+        );
+    }
+    
+    @Test
+    public void testSequences() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    SequenceExpr \n" +
+                "      IntegerLiteral 0\n" +
+                "      IntegerLiteral 2\n",
+                parse("out {0, 2}")
+        );
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    MapOperator \n" +
+                "      SequenceExpr \n" +
+                "        IntegerLiteral 1\n" +
+                "        IntegerLiteral 3\n" +
+                "      LambdaExpr [x]\n" +
+                "        SequenceExpr \n" +
+                "          IntegerLiteral 1\n" +
+                "          RefExpr x\n",
+                parse("out map({1, 3}, x -> {1, x})")
+        );
+    }
+    
+    @Test
+    public void testReduceOperator() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    ReduceOperator \n" +
+                "      SequenceExpr \n" +
+                "        IntegerLiteral 1\n" +
+                "        IntegerLiteral 2\n" +
+                "      IntegerLiteral 0\n" +
+                "      LambdaExpr [a, b]\n" +
+                "        BinaryOperator +\n" +
+                "          RefExpr a\n" +
+                "          RefExpr b\n",
+                parse("out reduce({1, 2}, 0, a b -> a + b)")
+        );
+        assertEquals(
+                "ProgramStmt \n" +
+                "  OutStmt \n" +
+                "    ReduceOperator \n" +
+                "      MapOperator \n" +
+                "        SequenceExpr \n" +
+                "          IntegerLiteral 1\n" +
+                "          IntegerLiteral 2\n" +
+                "        LambdaExpr [elem]\n" +
+                "          BinaryOperator *\n" +
+                "            RefExpr elem\n" +
+                "            IntegerLiteral 2\n" +
+                "      IntegerLiteral 0\n" +
+                "      LambdaExpr [a, b]\n" +
+                "        BinaryOperator +\n" +
+                "          RefExpr a\n" +
+                "          RefExpr b\n",
+                parse("out reduce(map({1, 2}, elem -> elem * 2), 0, a b -> a + b)")
+        );
+    }
+    
+    @Test
+    public void testSeveralStatements() throws Exception {
+        assertEquals(
+                "ProgramStmt \n" +
+                "  VarDeclStmt a\n" +
+                "    IntegerLiteral 1\n" +
+                "  PrintStmt \n" +
+                "    StringLiteral \"a = \"\n" +
+                "  OutStmt \n" +
+                "    RefExpr a\n", 
+                parse(
+                        "var a = 1\n" +
+                        "print \"a = \"\n" +
+                        "out a"
+                )
         );
     }
     
