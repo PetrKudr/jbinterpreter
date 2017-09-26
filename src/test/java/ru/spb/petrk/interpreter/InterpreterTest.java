@@ -144,6 +144,18 @@ public class InterpreterTest extends TestCase {
     }
     
     @Test
+    public void testSumOfSequences() throws Exception {
+        assertEquals(
+                "10",
+                interpret(
+                        "var seqOfSeq = map({1, 3}, n -> {1, n})\n" +
+                        "var sumsOfSeq = map(seqOfSeq, x -> reduce(x, 0, l r -> l + r))\n" +
+                        "out reduce(sumsOfSeq, 0, l r -> l + r)"
+                )
+        );
+    }
+    
+    @Test
     public void testCalcPi() throws Exception {
         String golden = "pi = 3.1435886595857";
         String interpreted = interpret(
