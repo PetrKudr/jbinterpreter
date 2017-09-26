@@ -129,7 +129,7 @@ public final class ASTInterpreter implements Interpreter {
     }
     
     private static InterpreterError toInterpretError(ParserError parseError) {
-        return new InterpreterError(
+        return new ASTInterpreterError(
                 parseError.message, 
                 parseError.offendingStartOffset,
                 parseError.offendingStartLine, 
@@ -164,7 +164,7 @@ public final class ASTInterpreter implements Interpreter {
         public <T extends Value> T eval(Class<T> cls, AST expr) {
             Value val = eval(expr);
             if (!cls.isAssignableFrom(val.getClass())) {
-                InterpreterError error = new InterpreterError(
+                InterpreterError error = new ASTInterpreterError(
                         "mismatched types: " 
                             + "expected \"" + getValueType(cls) + "\"," 
                             + " but found \"" + getValueType(val.getClass()) + "\"", 
@@ -275,7 +275,7 @@ public final class ASTInterpreter implements Interpreter {
         public Value visitRefExpr(RefExpr expr) {
             Value val = symTab.get(expr.getName());
             if (val == null) {
-                InterpreterError error = new InterpreterError(
+                InterpreterError error = new ASTInterpreterError(
                         "unresolved variable: \"" + expr.getName() + "\"", 
                         expr.getStart().getOffset(), 
                         expr.getStart().getLine(),
@@ -296,7 +296,7 @@ public final class ASTInterpreter implements Interpreter {
         @Override
         public Value visitVarDeclStmt(VarDeclStmt stmt) {
             if (symTab.containsKey(stmt.getName())) {
-                InterpreterError error = new InterpreterError(
+                InterpreterError error = new ASTInterpreterError(
                         "redeclaration of variable " + "\"" + stmt.getName() + "\"", 
                         stmt.getStart().getOffset(), 
                         stmt.getStart().getLine(),

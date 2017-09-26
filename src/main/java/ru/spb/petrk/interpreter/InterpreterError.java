@@ -5,36 +5,21 @@
  */
 package ru.spb.petrk.interpreter;
 
-import ru.spb.petrk.ast.ASTUtils;
 
 /**
+ * Basic information about error happened during interpretation.
  *
  * @author petrk
  */
-public final class InterpreterError {
+public interface InterpreterError {
     
-    public final String message;
+    String getMessage();
     
-    public final int offendingStartOffset;
+    int getOffendingStartOffset();
     
-    public final int offendingStartLine;
+    int getOffendingStartLine();
     
-    public final int offendingStartColumn;
+    int getOffendingStartColumn();
     
-    public final int offendingLength;
-
-    public InterpreterError(String message, int offendingStartOffset, 
-            int offendingStartLine, int offendingStartColumn, 
-            int offendingLength) {
-        this.message = message;
-        this.offendingStartOffset = offendingStartOffset;
-        this.offendingStartLine = offendingStartLine;
-        this.offendingStartColumn = offendingStartColumn;
-        this.offendingLength = offendingLength;
-    }
-    
-    @Override
-    public String toString() {
-        return ASTUtils.position(offendingStartLine, offendingStartColumn) + message; 
-    }
+    int getOffendingLength();
 }

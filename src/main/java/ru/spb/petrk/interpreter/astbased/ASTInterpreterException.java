@@ -16,7 +16,7 @@ import ru.spb.petrk.interpreter.InterpreterError;
     private final InterpreterError error;
 
     public ASTInterpreterException(InterpreterError error) {
-        super(error.message);
+        super(error.getMessage());
         this.error = error;
     }
 
