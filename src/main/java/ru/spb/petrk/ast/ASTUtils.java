@@ -31,6 +31,13 @@ import ru.spb.petrk.antlr4.JetBrainsLanguageParser;
  */
 public final class ASTUtils {
         
+    /**
+     * Parses input as a program in jblanguage.
+     * 
+     * @param input - [in] code
+     * @param errors - [out] list of lex or parse errors
+     * @return AST or null in case of error
+     */
     public static final ProgramStmt parse(String input, List<ParserError> errors) {
         assert errors.isEmpty();
         ParserErrorsListener errorsListener = new ParserErrorsListener();
