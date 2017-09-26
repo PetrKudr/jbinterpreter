@@ -30,6 +30,7 @@ import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.MapOperator;
 import ru.spb.petrk.ast.NumberType;
 import ru.spb.petrk.ast.OutStmt;
+import ru.spb.petrk.ast.ParamExpr;
 import ru.spb.petrk.ast.PrintStmt;
 import ru.spb.petrk.ast.ProgramStmt;
 import ru.spb.petrk.ast.ReduceOperator;
@@ -295,6 +296,12 @@ public final class ASTInterpreter implements Interpreter {
         @Override
         public Value visitLambdaExpr(LambdaExpr expr) {
             assert false : "Why interpreting lambda declaration?";
+            return VoidValueImpl.INSTANCE;
+        }
+
+        @Override
+        public Value visitParamExpr(ParamExpr expr) {
+            assert false : "Why interpreting lambda param declaration?";
             return VoidValueImpl.INSTANCE;
         }
 

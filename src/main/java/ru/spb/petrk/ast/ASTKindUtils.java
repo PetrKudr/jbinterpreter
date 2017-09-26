@@ -59,6 +59,10 @@ public final class ASTKindUtils {
         return ast instanceof LambdaExpr;
     }
     
+    public static boolean isParamExpr(AST ast) {
+        return ast instanceof ParamExpr;
+    }
+    
     public static boolean isOutStmt(AST ast) {
         return ast instanceof OutStmt;
     }

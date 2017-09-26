@@ -42,6 +42,8 @@ public interface ASTVisitor<T> {
             return visitOutStmt((OutStmt) ast);
         } else if (isPrintStmt(ast)) {
             return visitPrintStmt((PrintStmt) ast);
+        } else if (isParamExpr(ast)) {
+            return visitParamExpr((ParamExpr) ast);
         }
         throw new IllegalArgumentException("Unexpected AST node: " + ast.getClass().getName());
     }
@@ -65,6 +67,8 @@ public interface ASTVisitor<T> {
     T visitRefExpr(RefExpr expr);
     
     T visitLambdaExpr(LambdaExpr expr);
+    
+    T visitParamExpr(ParamExpr expr);
     
     T visitVarDeclStmt(VarDeclStmt stmt);
     

@@ -17,6 +17,7 @@ import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.FloatingLiteral;
 import ru.spb.petrk.ast.IntegerLiteral;
 import ru.spb.petrk.ast.LambdaExpr;
+import ru.spb.petrk.ast.ParamExpr;
 import ru.spb.petrk.ast.ProgramStmt;
 import ru.spb.petrk.ast.RefExpr;
 import ru.spb.petrk.ast.StringLiteral;
@@ -69,6 +70,7 @@ public class ParserTest {
                 "        IntegerLiteral 0\n" +
                 "        IntegerLiteral 10\n" +
                 "      LambdaExpr [i]\n" +
+                "        ParamExpr i\n" +
                 "        BinaryOperator ^\n" +
                 "          UnaryOperator -\n" +
                 "            IntegerLiteral 1\n" +
@@ -131,6 +133,7 @@ public class ParserTest {
                 "        IntegerLiteral 1\n" +
                 "        IntegerLiteral 3\n" +
                 "      LambdaExpr [x]\n" +
+                "        ParamExpr x\n" +
                 "        SequenceExpr \n" +
                 "          IntegerLiteral 1\n" +
                 "          RefExpr x\n",
@@ -149,6 +152,8 @@ public class ParserTest {
                 "        IntegerLiteral 2\n" +
                 "      IntegerLiteral 0\n" +
                 "      LambdaExpr [a, b]\n" +
+                "        ParamExpr a\n" +
+                "        ParamExpr b\n" +
                 "        BinaryOperator +\n" +
                 "          RefExpr a\n" +
                 "          RefExpr b\n",
@@ -163,11 +168,14 @@ public class ParserTest {
                 "          IntegerLiteral 1\n" +
                 "          IntegerLiteral 2\n" +
                 "        LambdaExpr [elem]\n" +
+                "          ParamExpr elem\n" +
                 "          BinaryOperator *\n" +
                 "            RefExpr elem\n" +
                 "            IntegerLiteral 2\n" +
                 "      IntegerLiteral 0\n" +
                 "      LambdaExpr [a, b]\n" +
+                "        ParamExpr a\n" +
+                "        ParamExpr b\n" +
                 "        BinaryOperator +\n" +
                 "          RefExpr a\n" +
                 "          RefExpr b\n",
@@ -205,6 +213,7 @@ public class ParserTest {
                 "        IntegerLiteral 0\n" +
                 "        RefExpr n\n" +
                 "      LambdaExpr [i]\n" +
+                "        ParamExpr i\n" +
                 "        BinaryOperator /\n" +
                 "          BinaryOperator ^\n" +
                 "            UnaryOperator -\n" +
@@ -222,6 +231,8 @@ public class ParserTest {
                 "        RefExpr sequence\n" +
                 "        IntegerLiteral 0\n" +
                 "        LambdaExpr [x, y]\n" +
+                "          ParamExpr x\n" +
+                "          ParamExpr y\n" +
                 "          BinaryOperator +\n" +
                 "            RefExpr x\n" +
                 "            RefExpr y\n" +
@@ -304,6 +315,8 @@ public class ParserTest {
             sb.append(((StringLiteral) ast).getString());
         } else if (ASTKindUtils.isVarDeclStmt(ast)) {
             sb.append(((VarDeclStmt) ast).getName());
+        } else if (ASTKindUtils.isParamExpr(ast)) {
+            sb.append(((ParamExpr) ast).getName());
         }
     }
     
@@ -342,6 +355,8 @@ public class ParserTest {
             return "VarDeclStmt";
         } else if (ASTKindUtils.isProgramStmt(ast)) {
             return "ProgramStmt";
+        } else if (ASTKindUtils.isParamExpr(ast)) {
+            return "ParamExpr";
         }
         return "Unexpected!";
     }
