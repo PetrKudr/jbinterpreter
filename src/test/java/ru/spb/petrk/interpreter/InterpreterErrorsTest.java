@@ -55,7 +55,7 @@ public class InterpreterErrorsTest extends TestCase {
     @Test
     public void testUnaryMinusWithSequence() throws Exception {
         assertEquals(
-                "line 1:6 mismatched types: expected \"Number\", but found \"Sequence\"\n",
+                "line 1:6 mismatched types: expected \"Number\", but found \"Sequence of Integer\"\n",
                 interpret("out -{1, 2}")
         );        
     }

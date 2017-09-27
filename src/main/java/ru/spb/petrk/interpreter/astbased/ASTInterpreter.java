@@ -357,7 +357,11 @@ public final class ASTInterpreter implements Interpreter {
         }
         
         private static String getValueType(Class<? extends Value> cls) {
-            if (IntValue.class.isAssignableFrom(cls)) {
+            if (VoidValue.class.isAssignableFrom(cls)) {
+                return "Void";
+            } else if (IntSequenceValue.class.isAssignableFrom(cls)) {
+                return "Sequence of Integer"; 
+            } if (IntValue.class.isAssignableFrom(cls)) {
                 return ASTUtils.getTypeClassName(IntegerType.class);
             } else if (FloatingValue.class.isAssignableFrom(cls)) {
                 return ASTUtils.getTypeClassName(FloatingType.class);
@@ -367,8 +371,6 @@ public final class ASTInterpreter implements Interpreter {
                 return ASTUtils.getTypeClassName(SequenceType.class);
             } else if (NumberValue.class.isAssignableFrom(cls)) {
                 return ASTUtils.getTypeClassName(NumberType.class);
-            } else if (VoidValue.class.isAssignableFrom(cls)) {
-                return "Void";
             }
             return "Unexpected value type!";
         }
