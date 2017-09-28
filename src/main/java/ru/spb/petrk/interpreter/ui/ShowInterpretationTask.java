@@ -54,11 +54,14 @@ public class ShowInterpretationTask implements Runnable {
 
     @Override
     public void run() {
+        boolean finishedSuccessfully = false;
+        long startTime = 0;
         try {
             clearOutput(output);
             clearErrors(input);
             final PrintStream out = new PrintStream(new TextAreaOutputStream());
-            interpreter.interpret(text, new InterpreterListener() {
+            startTime =  System.currentTimeMillis();
+            finishedSuccessfully = interpreter.interpret(text, new InterpreterListener() {
 
                 private boolean hadOutput = false;
 
@@ -84,6 +87,21 @@ public class ShowInterpretationTask implements Runnable {
             });
         } catch (Throwable thr) {
             LOG.log(Level.INFO, thr.getMessage(), thr);
+        }
+        
+        final boolean finalFinishedSuccessfully = finishedSuccessfully;
+        if (finalFinishedSuccessfully) {
+            final long finalStartTime = startTime;
+            final long finalStopTime = System.currentTimeMillis();
+            SwingUtilities.invokeLater(() -> {
+                if (finalStopTime >= finalStartTime) {
+                    output.append("\n\n");
+                    output.append("Interpretation is finished [" + String.valueOf(finalStopTime - finalStartTime) + " ms]");
+                } else {
+                    output.append("\n\n");
+                    output.append("Interpretation is finished [Failed to measure time]");
+                }
+            });
         }
     }
     
