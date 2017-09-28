@@ -9,11 +9,18 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 
 /**
+ * Represents evaluator for a float.
  *
  * @author petrk
  */
 public interface FloatEvaluator extends NumberEvaluator {
 
+    /**
+     * Computes value using state.
+     * 
+     * @param symTab - state
+     * @return double result
+     */
     double value(SymTab symTab);
 
     @Override

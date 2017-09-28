@@ -7,15 +7,21 @@ package ru.spb.petrk.interpreter.evalbased.model;
 
 import java.util.Iterator;
 import java.util.stream.BaseStream;
-import java.util.stream.Stream;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
+ * Represents evaluator for a sequence.
  *
  * @author petrk
  */
 public interface SequenceEvaluator<S extends BaseStream> extends Evaluator {
 
+    /**
+     * Computes stream of elements using state.
+     * 
+     * @param symTab - state
+     * @return stream of elements
+     */
     S stream(SymTab symTab);
 
     @Override

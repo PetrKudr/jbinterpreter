@@ -8,10 +8,17 @@ package ru.spb.petrk.interpreter.evalbased.model;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
+ * Represents evaluator for a string.
  *
  * @author petrk
  */
 public interface StringEvaluator extends Evaluator {
 
+    /**
+     * Computes value using state.
+     * 
+     * @param symTab - state
+     * @return string
+     */
     String value(SymTab symTab);
 }

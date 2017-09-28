@@ -8,11 +8,18 @@ package ru.spb.petrk.interpreter.evalbased.model;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
+ * Represents evaluator for an integer.
  *
  * @author petrk
  */
 public interface IntEvaluator extends NumberEvaluator {
 
+    /**
+     * Computes value using state.
+     * 
+     * @param symTab - state
+     * @return int result
+     */
     int value(SymTab symTab);
 
     @Override

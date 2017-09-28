@@ -8,6 +8,9 @@ package ru.spb.petrk.interpreter.evalbased.model;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
+ * Represents entity that can compute result from state.
+ * 
+ * Currently, symtab serves as a state. 
  *
  * @author petrk
  */

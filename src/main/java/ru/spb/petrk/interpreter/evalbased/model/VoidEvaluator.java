@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model;
 
 /**
+ * Represents evaluator for a void.
  *
  * @author petrk
  */

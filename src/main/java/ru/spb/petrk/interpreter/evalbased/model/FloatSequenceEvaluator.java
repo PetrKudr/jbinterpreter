@@ -8,6 +8,7 @@ package ru.spb.petrk.interpreter.evalbased.model;
 import java.util.stream.DoubleStream;
 
 /**
+ * Represents evaluator for a sequence of floats.
  *
  * @author petrk
  */

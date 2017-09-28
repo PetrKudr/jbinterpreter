@@ -8,6 +8,7 @@ package ru.spb.petrk.interpreter.evalbased.model;
 import java.util.stream.Stream;
 
 /**
+ * Represents evaluator for a sequence of sequences.
  *
  * @author petrk
  */
