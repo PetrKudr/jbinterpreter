@@ -6,7 +6,7 @@ Interpreter for the following language:
 * `stmt ::= var identifier = expr | out expr | print "string"`
 * `program ::= stmt | program stmt`
 
-**How to build and run**
+**How to build and run (using Maven)**
 * `cd` to the project folder
 * `mvn install`
 * `mvn exec:java`
