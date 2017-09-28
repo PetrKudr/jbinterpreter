@@ -80,7 +80,7 @@ public final class ASTUtils {
         return ast;
     }
     
-    public static String getTypeClassName(Class<? extends Type> cls) {
+    public static String getTypeName(Class<? extends Type> cls) {
         if (IntegerType.class.isAssignableFrom(cls)) {
             return "Integer";
         } else if (FloatingType.class.isAssignableFrom(cls)) {
@@ -98,20 +98,20 @@ public final class ASTUtils {
     public static String getTypeName(Type type) {
         if (isSequenceType(type)) {
             Type curType = type;
-            StringBuilder name = new StringBuilder(getTypeClassName(curType.getClass()));
+            StringBuilder name = new StringBuilder(getTypeName(curType.getClass()));
             while (isSequenceType(curType)) {
                 curType = ((SequenceType) curType).getElementType();
-                name.append(" of ").append(getTypeClassName(curType.getClass()));
+                name.append(" of ").append(getTypeName(curType.getClass()));
             }
             return name.toString();
         }
-        return getTypeClassName(type.getClass());
+        return getTypeName(type.getClass());
     }
     
     public static String getGeneralizedTypeName(Type type) {
-        return getTypeName(type)
-                .replaceAll(getTypeClassName(IntegerType.class), getTypeClassName(NumberType.class))
-                .replaceAll(getTypeClassName(FloatingType.class), getTypeClassName(NumberType.class));
+        return ASTUtils.getTypeName(type)
+                .replaceAll(getTypeName(IntegerType.class), getTypeName(NumberType.class))
+                .replaceAll(getTypeName(FloatingType.class), getTypeName(NumberType.class));
     }
     
     public static String position(AST ast) {

@@ -461,7 +461,7 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
     private ASTUtils.ParserError reportMismatchedTypes(Expr expr, Class<? extends Type> expected) {
         return reportError(
                     "mismatched types: " 
-                        + "expected \"" + ASTUtils.getTypeClassName(expected) + "\"," 
+                        + "expected \"" + ASTUtils.getTypeName(expected) + "\"," 
                         + " but found \"" + ASTUtils.getTypeName(expr.getType()) + "\"", 
                     expr
         );

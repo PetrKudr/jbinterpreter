@@ -362,15 +362,15 @@ public final class ASTInterpreter implements Interpreter {
             } else if (IntSequenceValue.class.isAssignableFrom(cls)) {
                 return "Sequence of Integer"; 
             } if (IntValue.class.isAssignableFrom(cls)) {
-                return ASTUtils.getTypeClassName(IntegerType.class);
+                return ASTUtils.getTypeName(IntegerType.class);
             } else if (FloatingValue.class.isAssignableFrom(cls)) {
-                return ASTUtils.getTypeClassName(FloatingType.class);
+                return ASTUtils.getTypeName(FloatingType.class);
             } else if (StringValue.class.isAssignableFrom(cls)) {
-                return ASTUtils.getTypeClassName(StringType.class);
+                return ASTUtils.getTypeName(StringType.class);
             } else if (SequenceValue.class.isAssignableFrom(cls)) {
-                return ASTUtils.getTypeClassName(SequenceType.class);
+                return ASTUtils.getTypeName(SequenceType.class);
             } else if (NumberValue.class.isAssignableFrom(cls)) {
-                return ASTUtils.getTypeClassName(NumberType.class);
+                return ASTUtils.getTypeName(NumberType.class);
             }
             return "Unexpected value type!";
         }
