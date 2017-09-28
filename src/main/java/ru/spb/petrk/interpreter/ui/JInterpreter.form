@@ -75,7 +75,6 @@
           <SubComponents>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="miASTBased">
               <Properties>
-                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="AST based"/>
               </Properties>
               <Events>
@@ -84,6 +83,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="miEvalsBased">
               <Properties>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Evaluators based"/>
               </Properties>
               <Events>

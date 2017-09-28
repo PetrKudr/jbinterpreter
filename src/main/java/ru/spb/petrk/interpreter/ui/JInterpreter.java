@@ -48,7 +48,7 @@ public class JInterpreter extends javax.swing.JFrame {
     
     private File openedFile = null;
     
-    private boolean astBasedInterpreter = true;
+    private boolean astBasedInterpreter = false;
     
     /**
      * Creates new form JInterpreter
@@ -266,7 +266,6 @@ public class JInterpreter extends javax.swing.JFrame {
 
         menuInterpreters.setText("Interpreters");
 
-        miASTBased.setSelected(true);
         miASTBased.setText("AST based");
         miASTBased.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,6 +274,7 @@ public class JInterpreter extends javax.swing.JFrame {
         });
         menuInterpreters.add(miASTBased);
 
+        miEvalsBased.setSelected(true);
         miEvalsBased.setText("Evaluators based");
         miEvalsBased.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
