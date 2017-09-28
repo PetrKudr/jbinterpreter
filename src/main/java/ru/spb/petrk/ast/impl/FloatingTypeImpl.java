@@ -24,4 +24,10 @@ public final class FloatingTypeImpl implements FloatingType {
     public boolean isCompatibleWith(Type other) {
         return isIntegerType(other) || isFloatingType(other);
     }
+
+    @Override
+    public Type common(Type other) {
+        assert isCompatibleWith(other);
+        return this; // floating type is always wider
+    }
 }

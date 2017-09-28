@@ -33,4 +33,12 @@ public final class SequenceTypeImpl implements SequenceType {
         return isSequenceType(other)
                 && elemType.isCompatibleWith(((SequenceType) other).getElementType());
     }
+
+    @Override
+    public Type common(Type other) {
+        assert isCompatibleWith(other);
+        return new SequenceTypeImpl(
+                elemType.common(((SequenceType) other).getElementType())
+        );
+    }
 }

@@ -23,4 +23,12 @@ public interface MapOperator extends Expr {
      * @return lambda of type (a) -> expr
      */
     LambdaExpr getLambda();
+
+    /**
+     * Specializes getType from base class
+     * 
+     * @return sequence type
+     */
+    @Override
+    SequenceType getType();
 }

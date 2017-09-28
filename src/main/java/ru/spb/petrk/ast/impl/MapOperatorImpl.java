@@ -11,6 +11,7 @@ import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.MapOperator;
+import ru.spb.petrk.ast.SequenceType;
 import ru.spb.petrk.ast.Type;
 
 /**
@@ -40,7 +41,7 @@ public class MapOperatorImpl extends LeftRightOffsetableASTBase implements MapOp
     }
 
     @Override
-    public Type getType() {
+    public SequenceType getType() {
         return new SequenceTypeImpl(lambda.getType());
     }
 

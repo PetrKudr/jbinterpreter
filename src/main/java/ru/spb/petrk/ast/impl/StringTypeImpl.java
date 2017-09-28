@@ -23,4 +23,10 @@ public final class StringTypeImpl implements StringType {
     public boolean isCompatibleWith(Type other) {
         return isStringType(other);
     }
+
+    @Override
+    public Type common(Type other) {
+        assert isCompatibleWith(other);
+        return this;
+    }
 }

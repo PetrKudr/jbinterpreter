@@ -19,4 +19,12 @@ public interface Type {
      * @return true if compatible, false otherwise
      */
     boolean isCompatibleWith(Type other);
+    
+    /**
+     * Returns common type for this type and the given one.
+     * 
+     * @param other
+     * @return type
+     */
+    Type common(Type other);
 }

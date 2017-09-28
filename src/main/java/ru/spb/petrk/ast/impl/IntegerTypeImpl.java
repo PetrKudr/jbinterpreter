@@ -24,4 +24,10 @@ public final class IntegerTypeImpl implements IntegerType {
     public boolean isCompatibleWith(Type other) {
         return isIntegerType(other) || isFloatingType(other);
     }
+
+    @Override
+    public Type common(Type other) {
+        assert isCompatibleWith(other);
+        return other; // if other is floating, it is wider
+    }
 }

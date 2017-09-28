@@ -319,6 +319,8 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         }
         Type neutralType = neutral.getType();
         
+        Type widerType = seqElemType.common(neutralType);
+        
         // Let's build lambda of type (x y) -> ...
         // assuming that 
         //  - x = neutral
@@ -326,8 +328,8 @@ import ru.spb.petrk.ast.impl.VarDeclStmtImpl;
         final String lambdaFirstParam = ctx.IDENTIFIER(0).getText();
         final String lambdaSecondParam = ctx.IDENTIFIER(1).getText();
         pushSymTab();
-        putSym(lambdaFirstParam, neutralType);
-        putSym(lambdaSecondParam, seqElemType);
+        putSym(lambdaFirstParam, widerType);
+        putSym(lambdaSecondParam, widerType);
         LambdaExpr lambda;
         try {
             lambda = visitReduceLambda(ctx);
