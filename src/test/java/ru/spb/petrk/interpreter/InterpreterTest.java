@@ -169,4 +169,30 @@ public abstract class InterpreterTest extends AbstractInterpreterTest {
         assertTrue(interpreted.length() >= golden.length());
         assertTrue(interpreted.startsWith(golden));
     }
+    
+    @Test 
+    public void testDeepSequenceOfSequences() throws Exception {
+        assertEquals(
+                "24", 
+                interpret(
+                        "var deg1 = {1, 2}\n" +
+                        "var deg2 = map(deg1, x -> {1, 2})\n" +
+                        "var deg3 = map(deg2, d1 -> map(d1, x -> {1, 2}))\n" +
+                        "var deg4 = map(deg3, d2 -> map(d2, d1 -> map(d1, x -> {1, 2})))\n" +
+                        "out reduce(map(deg4, d3 \n" +
+                        "        -> reduce(map(d3, d2 \n" +
+                        "            -> reduce(map(d2, d1 \n" +
+                        "                -> reduce(d1, 0, a b -> a + b)), \n" +
+                        "                0, \n" +
+                        "                a b -> a + b\n" +
+                        "            )), \n" +
+                        "            0, \n" +
+                        "            a b -> a + b\n" +
+                        "        )), \n" +
+                        "        0, \n" +
+                        "        a b -> a + b\n" +
+                        "    )"
+                )
+        );
+    }
 }
