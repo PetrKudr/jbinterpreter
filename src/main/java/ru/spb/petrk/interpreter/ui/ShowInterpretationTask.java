@@ -52,34 +52,38 @@ public class ShowInterpretationTask implements Runnable {
 
     @Override
     public void run() {
-        clearOutput(output);
-        clearErrors(input);
-        final PrintStream out = new PrintStream(new TextAreaOutputStream());
-        Interpreter interpreter = new ASTInterpreter();
-        interpreter.interpret(text, new InterpreterListener() {
-            
-            private boolean hadOutput = false;
-            
-            @Override
-            public void onOut(String msg) {
-                SwingUtilities.invokeLater(() -> {
-                    hadOutput = true;
-                    out.print(msg);
-                });
-            }
+        try {
+            clearOutput(output);
+            clearErrors(input);
+            final PrintStream out = new PrintStream(new TextAreaOutputStream());
+            Interpreter interpreter = new ASTInterpreter();
+            interpreter.interpret(text, new InterpreterListener() {
 
-            @Override
-            public void onError(InterpreterError error) {
-                SwingUtilities.invokeLater(() -> {
-                    if (hadOutput) {
-                        out.println();
-                        hadOutput = false;
-                    }
-                    out.println(error.toString());
-                    highlightError(input, error);
-                });
-            }
-        });
+                private boolean hadOutput = false;
+
+                @Override
+                public void onOut(String msg) {
+                    SwingUtilities.invokeLater(() -> {
+                        hadOutput = true;
+                        out.print(msg);
+                    });
+                }
+
+                @Override
+                public void onError(InterpreterError error) {
+                    SwingUtilities.invokeLater(() -> {
+                        if (hadOutput) {
+                            out.println();
+                            hadOutput = false;
+                        }
+                        out.println(error.toString());
+                        highlightError(input, error);
+                    });
+                }
+            });
+        } catch (Throwable thr) {
+            LOG.log(Level.INFO, thr.getMessage(), thr);
+        }
     }
     
     
