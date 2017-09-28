@@ -5,8 +5,6 @@
  */
 package ru.spb.petrk.ast;
 
-import java.util.List;
-
 
 /**
  * Represents an AST node that corresponds to the statement rule in the language.

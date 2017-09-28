@@ -5,16 +5,7 @@
  */
 package ru.spb.petrk.interpreter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import junit.framework.TestCase;
 import org.junit.Test;
-import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
-import ru.spb.petrk.interpreter.evalbased.EvalInterpreter;
 
 /**
  *

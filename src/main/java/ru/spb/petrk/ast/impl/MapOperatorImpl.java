@@ -12,7 +12,6 @@ import ru.spb.petrk.ast.Expr;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.MapOperator;
 import ru.spb.petrk.ast.SequenceType;
-import ru.spb.petrk.ast.Type;
 
 /**
  *

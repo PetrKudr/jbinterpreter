@@ -22,7 +22,6 @@ import org.fife.ui.rsyntaxtextarea.SquiggleUnderlineHighlightPainter;
 import ru.spb.petrk.interpreter.Interpreter;
 import ru.spb.petrk.interpreter.InterpreterError;
 import ru.spb.petrk.interpreter.InterpreterListener;
-import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
 
 /**
  *

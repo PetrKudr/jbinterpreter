@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.Expr;
-import ru.spb.petrk.ast.Stmt;
 import ru.spb.petrk.ast.VarDeclStmt;
 
 /**

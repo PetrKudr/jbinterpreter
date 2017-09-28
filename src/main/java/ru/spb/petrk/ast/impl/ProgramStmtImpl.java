@@ -7,7 +7,6 @@ package ru.spb.petrk.ast.impl;
 
 import java.util.Collections;
 import java.util.List;
-import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ProgramStmt;
 import ru.spb.petrk.ast.Stmt;
 

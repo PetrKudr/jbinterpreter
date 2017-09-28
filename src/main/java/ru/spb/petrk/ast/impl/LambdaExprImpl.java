@@ -6,7 +6,6 @@
 package ru.spb.petrk.ast.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import ru.spb.petrk.ast.AST;

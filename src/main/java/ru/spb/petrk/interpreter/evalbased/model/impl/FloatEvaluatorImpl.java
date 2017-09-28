@@ -5,14 +5,10 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
-import java.util.function.DoubleFunction;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.ToDoubleFunction;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
-import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.FloatEvaluator;
+import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
 
 /**
  *

@@ -5,7 +5,6 @@
  */
 package ru.spb.petrk.interpreter;
 
-import junit.framework.TestCase;
 import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
 

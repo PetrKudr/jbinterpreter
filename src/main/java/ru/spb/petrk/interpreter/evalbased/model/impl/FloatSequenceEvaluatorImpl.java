@@ -6,12 +6,10 @@
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.FloatSequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.IntSequenceEvaluator;
-import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
 
 /**
  *

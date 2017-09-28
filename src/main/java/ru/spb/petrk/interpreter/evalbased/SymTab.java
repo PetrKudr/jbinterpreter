@@ -12,7 +12,6 @@ import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.ParamExpr;
 import ru.spb.petrk.ast.RefExpr;
 import ru.spb.petrk.ast.VarDeclStmt;
-import ru.spb.petrk.interpreter.InterpreterError;
 import static ru.spb.petrk.interpreter.evalbased.EvalInterpreter.reportError;
 import static ru.spb.petrk.interpreter.evalbased.EvalInterpreter.reportMismatchedTypes;
 import ru.spb.petrk.interpreter.evalbased.model.Evaluator;

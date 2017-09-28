@@ -7,7 +7,6 @@ package ru.spb.petrk.interpreter;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -18,6 +17,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.Vocabulary;
+import org.junit.Test;
 import ru.spb.petrk.antlr4.JetBrainsLanguageLexer;
 
 /**

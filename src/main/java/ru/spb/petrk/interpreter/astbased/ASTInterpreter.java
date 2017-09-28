@@ -5,21 +5,14 @@
  */
 package ru.spb.petrk.interpreter.astbased;
 
-import ru.spb.petrk.interpreter.astbased.model.impl.IntSequenceValue;
-import ru.spb.petrk.interpreter.astbased.model.impl.StringValueImpl;
-import ru.spb.petrk.interpreter.astbased.model.impl.MapSequenceValue;
-import ru.spb.petrk.interpreter.astbased.model.impl.IntValueImpl;
-import ru.spb.petrk.interpreter.astbased.model.impl.FloatingValueImpl;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ASTUtils;
 import ru.spb.petrk.ast.ASTUtils.ParserError;
-import static ru.spb.petrk.ast.ASTUtils.position;
 import ru.spb.petrk.ast.ASTVisitor;
 import ru.spb.petrk.ast.BinaryOperator;
 import ru.spb.petrk.ast.FloatingLiteral;
@@ -42,8 +35,8 @@ import ru.spb.petrk.ast.StringLiteral;
 import ru.spb.petrk.ast.StringType;
 import ru.spb.petrk.ast.UnaryOperator;
 import ru.spb.petrk.ast.VarDeclStmt;
-import ru.spb.petrk.interpreter.InterpreterError;
 import ru.spb.petrk.interpreter.Interpreter;
+import ru.spb.petrk.interpreter.InterpreterError;
 import ru.spb.petrk.interpreter.InterpreterListener;
 import ru.spb.petrk.interpreter.astbased.model.FloatingValue;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;
@@ -52,6 +45,11 @@ import ru.spb.petrk.interpreter.astbased.model.SequenceValue;
 import ru.spb.petrk.interpreter.astbased.model.StringValue;
 import ru.spb.petrk.interpreter.astbased.model.Value;
 import ru.spb.petrk.interpreter.astbased.model.VoidValue;
+import ru.spb.petrk.interpreter.astbased.model.impl.FloatingValueImpl;
+import ru.spb.petrk.interpreter.astbased.model.impl.IntSequenceValue;
+import ru.spb.petrk.interpreter.astbased.model.impl.IntValueImpl;
+import ru.spb.petrk.interpreter.astbased.model.impl.MapSequenceValue;
+import ru.spb.petrk.interpreter.astbased.model.impl.StringValueImpl;
 import ru.spb.petrk.interpreter.astbased.model.impl.VoidValueImpl;
 
 /**

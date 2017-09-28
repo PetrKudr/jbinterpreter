@@ -6,7 +6,6 @@
 package ru.spb.petrk.interpreter.astbased.model.impl;
 
 import java.util.Iterator;
-import java.util.Spliterator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import ru.spb.petrk.interpreter.astbased.model.IntValue;

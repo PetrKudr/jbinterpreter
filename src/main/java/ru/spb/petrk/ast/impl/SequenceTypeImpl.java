@@ -5,8 +5,6 @@
  */
 package ru.spb.petrk.ast.impl;
 
-import java.util.Objects;
-import ru.spb.petrk.ast.ASTKindUtils;
 import static ru.spb.petrk.ast.ASTKindUtils.isSequenceType;
 import ru.spb.petrk.ast.SequenceType;
 import ru.spb.petrk.ast.Type;

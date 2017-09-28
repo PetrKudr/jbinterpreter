@@ -5,7 +5,6 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model;
 
-import ru.spb.petrk.ast.ASTUtils;
 import ru.spb.petrk.ast.*;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.impl.FloatSequenceEvaluatorImpl;
