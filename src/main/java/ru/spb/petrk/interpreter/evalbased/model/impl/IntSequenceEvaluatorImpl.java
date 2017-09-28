@@ -7,6 +7,7 @@ package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.FloatSequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.IntSequenceEvaluator;
@@ -25,6 +26,9 @@ public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
 
     @Override
     public IntStream stream(SymTab symTab) {
+        if (Thread.interrupted()) {
+            throw new EvalInterruptedInterpreterException();
+        }
         return supplier.apply(symTab);
     }
     

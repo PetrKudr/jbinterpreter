@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
+import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.StringEvaluator;
 
@@ -22,6 +23,9 @@ public final class StringEvaluatorImpl implements StringEvaluator {
 
     @Override
     public String value(SymTab symTab) {
+        if (Thread.interrupted()) {
+            throw new EvalInterruptedInterpreterException();
+        }
         return value;
     }
     

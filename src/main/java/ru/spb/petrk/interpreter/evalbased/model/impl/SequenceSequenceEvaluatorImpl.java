@@ -7,6 +7,7 @@ package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
+import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.SequenceSequenceEvaluator;
@@ -25,6 +26,9 @@ public final class SequenceSequenceEvaluatorImpl implements SequenceSequenceEval
 
     @Override
     public Stream<SequenceEvaluator> stream(SymTab symTab) {
+        if (Thread.interrupted()) {
+            throw new EvalInterruptedInterpreterException();
+        }
         return supplier.apply(symTab);
     }
 }
