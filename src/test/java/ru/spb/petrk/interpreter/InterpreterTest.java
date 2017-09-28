@@ -82,6 +82,21 @@ public abstract class InterpreterTest extends AbstractInterpreterTest {
     }
     
     @Test
+    public void testIntegerDivision() throws Exception {
+        assertEquals("0", interpret("out 9/10"));
+        assertEquals("0", interpret("out 1/2"));
+        assertEquals("1", interpret("out 2/2"));
+        assertEquals("1", interpret("out 1/1"));
+    }
+    
+    @Test
+    public void testDivisionReduceOnIntegerSequence() throws Exception {
+        // "a b -> a / (b + 1)" is associative for the given input sequence
+        // and always gives 0
+        assertEquals("0", interpret("out reduce({1, 10}, 1, a b -> a / (b + 1))"));
+    }
+    
+    @Test
     public void testSequences() throws Exception {
         assertEquals(
                 "[0, 1, 2]",
