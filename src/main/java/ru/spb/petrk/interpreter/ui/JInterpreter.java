@@ -31,6 +31,8 @@ import javax.swing.undo.UndoManager;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
+import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
+import ru.spb.petrk.interpreter.evalbased.EvalInterpreter;
 
 /**
  *
@@ -45,6 +47,8 @@ public class JInterpreter extends javax.swing.JFrame {
     private final JFileChooser fileChooser = new JFileChooser();
     
     private File openedFile = null;
+    
+    private boolean astBasedInterpreter = true;
     
     /**
      * Creates new form JInterpreter
@@ -87,7 +91,11 @@ public class JInterpreter extends javax.swing.JFrame {
         editorArea.getDocument().addDocumentListener(new DocumentListener() {
             
             private void onUpdate(DocumentEvent e) {
-                controller.post(new ShowInterpretationTask((RSyntaxTextArea) editorArea, outputArea));
+                controller.post(new ShowInterpretationTask(
+                        (RSyntaxTextArea) editorArea, 
+                        outputArea,
+                        astBasedInterpreter ? new ASTInterpreter() : new EvalInterpreter()
+                ));
             }
             
             @Override
@@ -156,6 +164,9 @@ public class JInterpreter extends javax.swing.JFrame {
         menuExamples = new javax.swing.JMenu();
         miPi = new javax.swing.JMenuItem();
         miSeqOfSeq = new javax.swing.JMenuItem();
+        menuInterpreters = new javax.swing.JMenu();
+        miASTBased = new javax.swing.JCheckBoxMenuItem();
+        miEvalsBased = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -252,6 +263,27 @@ public class JInterpreter extends javax.swing.JFrame {
         menuExamples.add(miSeqOfSeq);
 
         mainMenuBar.add(menuExamples);
+
+        menuInterpreters.setText("Interpreters");
+
+        miASTBased.setSelected(true);
+        miASTBased.setText("AST based");
+        miASTBased.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miASTBasedActionPerformed(evt);
+            }
+        });
+        menuInterpreters.add(miASTBased);
+
+        miEvalsBased.setText("Evaluators based");
+        miEvalsBased.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miEvalsBasedActionPerformed(evt);
+            }
+        });
+        menuInterpreters.add(miEvalsBased);
+
+        mainMenuBar.add(menuInterpreters);
 
         setJMenuBar(mainMenuBar);
 
@@ -353,6 +385,26 @@ public class JInterpreter extends javax.swing.JFrame {
         );
     }//GEN-LAST:event_miSeqOfSeqActionPerformed
 
+    private void miASTBasedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miASTBasedActionPerformed
+        if (miASTBased.isSelected()) {
+            astBasedInterpreter = true;
+            miEvalsBased.setSelected(false);
+        } else {
+            // restore check flag
+            miASTBased.setSelected(true);
+        }
+    }//GEN-LAST:event_miASTBasedActionPerformed
+
+    private void miEvalsBasedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miEvalsBasedActionPerformed
+        if (miEvalsBased.isSelected()) {
+            astBasedInterpreter = false;
+            miASTBased.setSelected(false);
+        } else {
+            // restore check flag
+            miEvalsBased.setSelected(true);
+        }
+    }//GEN-LAST:event_miEvalsBasedActionPerformed
+
     private void saveFile(File toFile) {
         File oldOpenedFile = openedFile;
         openedFile = toFile;
@@ -414,6 +466,9 @@ public class JInterpreter extends javax.swing.JFrame {
     private javax.swing.JMenuBar mainMenuBar;
     private javax.swing.JMenu menuExamples;
     private javax.swing.JMenu menuFile;
+    private javax.swing.JMenu menuInterpreters;
+    private javax.swing.JCheckBoxMenuItem miASTBased;
+    private javax.swing.JCheckBoxMenuItem miEvalsBased;
     private javax.swing.JMenuItem miExit;
     private javax.swing.JMenuItem miOpenFile;
     private javax.swing.JMenuItem miPi;

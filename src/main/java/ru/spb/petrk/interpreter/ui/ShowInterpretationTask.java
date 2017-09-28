@@ -38,12 +38,15 @@ public class ShowInterpretationTask implements Runnable {
     
     private final JTextArea output; 
     
+    private final Interpreter interpreter;
+    
     private volatile Future<?> taskFuture;
 
-    public ShowInterpretationTask(RSyntaxTextArea input, JTextArea output) {
+    public ShowInterpretationTask(RSyntaxTextArea input, JTextArea output, Interpreter interpreter) {
         this.text = input.getText();
         this.input = input;
         this.output = output;
+        this.interpreter = interpreter;
     }
     
     public void setTaskFuture(Future<?> taskFuture) {
@@ -56,7 +59,6 @@ public class ShowInterpretationTask implements Runnable {
             clearOutput(output);
             clearErrors(input);
             final PrintStream out = new PrintStream(new TextAreaOutputStream());
-            Interpreter interpreter = new ASTInterpreter();
             interpreter.interpret(text, new InterpreterListener() {
 
                 private boolean hadOutput = false;
