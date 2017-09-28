@@ -9,9 +9,13 @@ package ru.spb.petrk.interpreter.astbased;
  *
  * @author petrk
  */
-public class ASTInterruptedInterpreterException extends ASTInterpreterException {
-
-    public ASTInterruptedInterpreterException() {
-        super(null);
-    }
+@FunctionalInterface
+public interface ASTInterpreterListener {
+    
+    /**
+     * Called when interpreter prints string or result of expression.
+     * 
+     * @param msg 
+     */
+    void onOut(String msg);
 }

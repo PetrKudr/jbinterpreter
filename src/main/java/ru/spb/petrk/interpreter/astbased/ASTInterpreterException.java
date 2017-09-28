@@ -11,7 +11,7 @@ import ru.spb.petrk.interpreter.InterpreterError;
  *
  * @author petrk
  */
-/*package*/ class ASTInterpreterException extends RuntimeException {
+public class ASTInterpreterException extends RuntimeException {
     
     private final InterpreterError error;
 

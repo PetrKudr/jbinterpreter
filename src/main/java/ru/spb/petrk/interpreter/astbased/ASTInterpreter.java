@@ -86,7 +86,7 @@ public final class ASTInterpreter implements Interpreter {
             return false;
         }
         try {
-            interpret(program, new HashMap<>(), listener);
+            interpret(program, new HashMap<>(), (msg) -> listener.onOut(msg));
             return true;
         } catch (ASTInterruptedInterpreterException ex) {
             // Just return
@@ -130,7 +130,7 @@ public final class ASTInterpreter implements Interpreter {
      * 
      * @return value of the code (void value if code doesn't return value)
      */
-    public Value interpret(AST code, Map<String, Value> symTable, InterpreterListener listener) {
+    public Value interpret(AST code, Map<String, Value> symTable, ASTInterpreterListener listener) {
         return new InterpretVisitor(listener, symTable).eval(code);
     }
     
@@ -146,11 +146,11 @@ public final class ASTInterpreter implements Interpreter {
     
     private static final class InterpretVisitor implements ASTVisitor<Value> {
         
-        private final InterpreterListener listener;
+        private final ASTInterpreterListener listener;
         
         private final Map<String, Value> symTab;
 
-        public InterpretVisitor(InterpreterListener listener, Map<String, Value> symTab) {
+        public InterpretVisitor(ASTInterpreterListener listener, Map<String, Value> symTab) {
             this.listener = listener;
             this.symTab = symTab;
         }
