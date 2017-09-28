@@ -5,6 +5,9 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model;
 
+import ru.spb.petrk.interpreter.evalbased.model.impl.ConstFloatEvaluatorImpl;
+import ru.spb.petrk.interpreter.evalbased.model.impl.ConstIntEvaluatorImpl;
+
 /**
  *
  * @author petrk
@@ -23,8 +26,16 @@ public final class EvalKindUtils {
         return eval instanceof IntEvaluator;
     }
     
+    public static boolean isConstIntEval(Evaluator eval) {
+        return eval instanceof ConstIntEvaluatorImpl;
+    }
+    
     public static boolean isFloatEval(Evaluator eval) {
         return eval instanceof FloatEvaluator;
+    }
+    
+    public static boolean isConstFloatEval(Evaluator eval) {
+        return eval instanceof ConstFloatEvaluatorImpl;
     }
     
     public static boolean isSequenceEval(Evaluator eval) {

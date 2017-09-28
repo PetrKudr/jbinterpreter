@@ -190,7 +190,11 @@ public final class EvalInterpreter implements Interpreter {
         public Evaluator visitUnaryOperator(UnaryOperator op) {
             NumberEvaluator val = visit(NumberEvaluator.class, op.getExpr());
             if (op.isMinus()) {
-                if (isIntEval(val)) {
+                if (isConstIntEval(val)) {
+                    return new ConstIntEvaluatorImpl(-((IntEvaluator) val).value(null));
+                } else if (isConstFloatEval(val)) {
+                    return new ConstFloatEvaluatorImpl(-((FloatEvaluator) val).value(null));
+                } else if (isIntEval(val)) {
                     return new IntEvaluatorImpl((st) -> -((IntEvaluator) val).value(st));
                 } else {
                     assert isFloatEval(val) : "Unexpected value type " + val;
@@ -209,19 +213,39 @@ public final class EvalInterpreter implements Interpreter {
             FloatEvaluator res;
             switch (op.getOperation()) {
                 case PLUS:
-                    res = new FloatEvaluatorImpl((st) -> left.value(st) + right.value(st));
+                    if (isConstFloatEval(left) && isConstFloatEval(right)) {
+                        res = new ConstFloatEvaluatorImpl(left.value(null) + right.value(null));
+                    } else {
+                        res = new FloatEvaluatorImpl((st) -> left.value(st) + right.value(st));
+                    }
                     break;
                 case MINUS:
-                    res = new FloatEvaluatorImpl((st) -> left.value(st) - right.value(st));
+                    if (isConstFloatEval(left) && isConstFloatEval(right)) {
+                        res = new ConstFloatEvaluatorImpl(left.value(null) - right.value(null));
+                    } else {
+                        res = new FloatEvaluatorImpl((st) -> left.value(st) - right.value(st));
+                    }
                     break;
                 case MULTIPLY:
-                    res = new FloatEvaluatorImpl((st) -> left.value(st) * right.value(st));
+                    if (isConstFloatEval(left) && isConstFloatEval(right)) {
+                        res = new ConstFloatEvaluatorImpl(left.value(null) * right.value(null));
+                    } else {
+                        res = new FloatEvaluatorImpl((st) -> left.value(st) * right.value(st));
+                    }
                     break;
                 case DIVIDE:
-                    res = new FloatEvaluatorImpl((st) -> left.value(st) / right.value(st));
+                    if (isConstFloatEval(left) && isConstFloatEval(right)) {
+                        res = new ConstFloatEvaluatorImpl(left.value(null) / right.value(null));
+                    } else {
+                        res = new FloatEvaluatorImpl((st) -> left.value(st) / right.value(st));
+                    }
                     break;
                 case POWER:
-                    res = new FloatEvaluatorImpl((st) -> Math.pow(left.value(st), right.value(st)));
+                    if (isConstFloatEval(left) && isConstFloatEval(right)) {
+                        res = new ConstFloatEvaluatorImpl(Math.pow(left.value(null), right.value(null)));
+                    } else {
+                        res = new FloatEvaluatorImpl((st) -> Math.pow(left.value(st), right.value(st)));
+                    }
                     break;
                 default:
                     throw new AssertionError("Unexpected op kind: " + op.getOperation());
