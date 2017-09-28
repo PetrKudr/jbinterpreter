@@ -48,6 +48,8 @@ import ru.spb.petrk.interpreter.evalbased.model.IntSequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.NumberEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.SequenceSequenceEvaluator;
+import ru.spb.petrk.interpreter.evalbased.model.impl.ConstIntEvaluatorImpl;
+import ru.spb.petrk.interpreter.evalbased.model.impl.ConstFloatEvaluatorImpl;
 import ru.spb.petrk.interpreter.evalbased.model.impl.FloatEvaluatorImpl;
 import ru.spb.petrk.interpreter.evalbased.model.impl.FloatSequenceEvaluatorImpl;
 import ru.spb.petrk.interpreter.evalbased.model.impl.IntEvaluatorImpl;
@@ -256,14 +258,14 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 1.1: {int} map({integers}, int -> int)
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new IntSequenceEvaluatorImpl((st) -> intInput.stream(st).map((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstIntEvaluatorImpl(val));
                     return intMapFun.value(lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 1.2: {int} map({doubles}, double -> int)
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new IntSequenceEvaluatorImpl((st) -> floatInput.stream(st).mapToInt((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstFloatEvaluatorImpl(val));
                     return intMapFun.value(lambdaSymTab);
                 }));
             } else {
@@ -285,14 +287,14 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 2.1: {double} map({integers}, int -> double)
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new FloatSequenceEvaluatorImpl((st) -> intInput.stream(st).mapToDouble((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstIntEvaluatorImpl(val));
                     return floatMapFun.value(lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 2.2: {double} map({doubles}, double -> double)
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new FloatSequenceEvaluatorImpl((st) -> floatInput.stream(st).map((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstFloatEvaluatorImpl(val));
                     return floatMapFun.value(lambdaSymTab);
                 }));
             } else {
@@ -314,14 +316,14 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 3.1: {{...},...,{...}} map({integers}, int -> {...})
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new SequenceSequenceEvaluatorImpl((st) -> intInput.stream(st).mapToObj((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstIntEvaluatorImpl(val));
                     return EvalUtils.injectSymTab(seqMapFun, lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 3.2: {{...},...,{...}} map({doubles}, double -> {...})
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new SequenceSequenceEvaluatorImpl((st) -> floatInput.stream(st).mapToObj((val) -> {
-                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new ConstFloatEvaluatorImpl(val));
                     return EvalUtils.injectSymTab(seqMapFun, lambdaSymTab);
                 }));
             } else {
@@ -370,8 +372,8 @@ public final class EvalInterpreter implements Interpreter {
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
                                         lambda, 
-                                        new IntEvaluatorImpl((any) -> l),
-                                        new IntEvaluatorImpl((any) -> r)
+                                        new ConstIntEvaluatorImpl(l),
+                                        new ConstIntEvaluatorImpl(r)
                                     );
                                     return intReduce.value(reduceSymTab);
                                 }
@@ -386,8 +388,8 @@ public final class EvalInterpreter implements Interpreter {
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
                                         lambda, 
-                                        new FloatEvaluatorImpl((any) -> l),
-                                        new FloatEvaluatorImpl((any) -> r)
+                                        new ConstFloatEvaluatorImpl(l),
+                                        new ConstFloatEvaluatorImpl(r)
                                     );
                                     return intReduce.value(reduceSymTab);
                                 }
@@ -413,8 +415,8 @@ public final class EvalInterpreter implements Interpreter {
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
                                             lambda, 
-                                            new FloatEvaluatorImpl((any) -> l),
-                                            new FloatEvaluatorImpl((any) -> r)
+                                            new ConstFloatEvaluatorImpl(l),
+                                            new ConstFloatEvaluatorImpl(r)
                                     );
                                     return floatReduce.value(reduceSymTab);
                                 }
@@ -429,8 +431,8 @@ public final class EvalInterpreter implements Interpreter {
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
                                             lambda, 
-                                            new FloatEvaluatorImpl((any) -> l),
-                                            new FloatEvaluatorImpl((any) -> r)
+                                            new ConstFloatEvaluatorImpl(l),
+                                            new ConstFloatEvaluatorImpl(r)
                                     );
                                     return floatReduce.value(reduceSymTab);
                                 }
@@ -480,12 +482,12 @@ public final class EvalInterpreter implements Interpreter {
 
         @Override
         public Evaluator visitIntegerLiteral(IntegerLiteral literal) {
-            return new IntEvaluatorImpl((any) -> literal.getValue());
+            return new ConstIntEvaluatorImpl(literal.getValue());
         }
 
         @Override
         public Evaluator visitFloatingLiteral(FloatingLiteral literal) {
-            return new FloatEvaluatorImpl((any) -> literal.getValue());
+            return new ConstFloatEvaluatorImpl(literal.getValue());
         }
 
         @Override
