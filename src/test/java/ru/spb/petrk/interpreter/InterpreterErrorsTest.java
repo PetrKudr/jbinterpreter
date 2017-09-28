@@ -8,13 +8,12 @@ package ru.spb.petrk.interpreter;
 import junit.framework.TestCase;
 import static junit.framework.TestCase.assertEquals;
 import org.junit.Test;
-import static ru.spb.petrk.interpreter.InterpreterTest.interpret;
 
 /**
  *
  * @author petrk
  */
-public class InterpreterErrorsTest extends TestCase {
+public abstract class InterpreterErrorsTest extends AbstractInterpreterTest {
     
     @Test
     public void testIncorrectSequence() throws Exception {

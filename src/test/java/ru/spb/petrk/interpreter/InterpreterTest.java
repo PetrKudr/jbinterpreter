@@ -14,12 +14,13 @@ import java.nio.charset.StandardCharsets;
 import junit.framework.TestCase;
 import org.junit.Test;
 import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
+import ru.spb.petrk.interpreter.evalbased.EvalInterpreter;
 
 /**
  *
  * @author petrk
  */
-public class InterpreterTest extends TestCase {
+public abstract class InterpreterTest extends AbstractInterpreterTest {
     
     @Test
     public void testHelloWorld() throws Exception {
@@ -167,22 +168,5 @@ public class InterpreterTest extends TestCase {
         );
         assertTrue(interpreted.length() >= golden.length());
         assertTrue(interpreted.startsWith(golden));
-    }
-    
-    /*package*/static String interpret(String input) {
-        final Charset charset = StandardCharsets.UTF_8;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             PrintStream ps = new PrintStream(baos, true, charset.name())) {
-            createInterpreter().interpret(input, ps, ps);
-            return new String(baos.toByteArray(), charset);
-        } catch (UnsupportedEncodingException ex) {
-            return "UTF8 is not supported?";
-        } catch (IOException ex) {
-            return ex.getMessage();
-        }
-    }
-    
-    private static Interpreter createInterpreter() {
-        return new ASTInterpreter();
     }
 }
