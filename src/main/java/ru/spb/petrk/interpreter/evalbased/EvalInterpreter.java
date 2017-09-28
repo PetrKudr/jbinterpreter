@@ -256,24 +256,21 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 1.1: {int} map({integers}, int -> int)
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new IntSequenceEvaluatorImpl((st) -> intInput.stream(st).map((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
                     return intMapFun.value(lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 1.2: {int} map({doubles}, double -> int)
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new IntSequenceEvaluatorImpl((st) -> floatInput.stream(st).mapToInt((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
                     return intMapFun.value(lambdaSymTab);
                 }));
             } else {
                 // Case 1.3: {int} map({{...}, {...}}, {...} -> int)
                 SequenceSequenceEvaluator seqInput = (SequenceSequenceEvaluator) input;
                 return new IntSequenceEvaluatorImpl((st) -> seqInput.stream(st).mapToInt((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), val);
+                    SymTab lambdaSymTab = SymTab.of(lambda, val);
                     return intMapFun.value(lambdaSymTab);
                 }));
             }
@@ -288,24 +285,21 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 2.1: {double} map({integers}, int -> double)
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new FloatSequenceEvaluatorImpl((st) -> intInput.stream(st).mapToDouble((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
                     return floatMapFun.value(lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 2.2: {double} map({doubles}, double -> double)
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new FloatSequenceEvaluatorImpl((st) -> floatInput.stream(st).map((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
                     return floatMapFun.value(lambdaSymTab);
                 }));
             } else {
                 // Case 2.3: {double} map({{...}, {...}}, {...} -> double)
                 SequenceSequenceEvaluator seqInput = (SequenceSequenceEvaluator) input;
                 return new FloatSequenceEvaluatorImpl((st) -> seqInput.stream(st).mapToDouble((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), val);
+                    SymTab lambdaSymTab = SymTab.of(lambda, val);
                     return floatMapFun.value(lambdaSymTab);
                 }));
             }
@@ -320,24 +314,21 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 3.1: {{...},...,{...}} map({integers}, int -> {...})
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluatorImpl) input;
                 return new SequenceSequenceEvaluatorImpl((st) -> intInput.stream(st).mapToObj((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new IntEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new IntEvaluatorImpl((any) -> val));
                     return EvalUtils.injectSymTab(seqMapFun, lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 3.2: {{...},...,{...}} map({doubles}, double -> {...})
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new SequenceSequenceEvaluatorImpl((st) -> floatInput.stream(st).mapToObj((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), new FloatEvaluatorImpl((any) -> val));
+                    SymTab lambdaSymTab = SymTab.of(lambda, new FloatEvaluatorImpl((any) -> val));
                     return EvalUtils.injectSymTab(seqMapFun, lambdaSymTab);
                 }));
             } else {
                 // Case 3.3: {{...},...,{...}} map({{...}, {...}}, {...} -> {...})
                 SequenceSequenceEvaluator seqInput = (SequenceSequenceEvaluator) input;
                 return new SequenceSequenceEvaluatorImpl((st) -> seqInput.stream(st).map((val) -> {
-                    SymTab lambdaSymTab = new SymTab();
-                    lambdaSymTab.putSym(lambda.getParams().get(0), val);
+                    SymTab lambdaSymTab = SymTab.of(lambda, val);
                     return EvalUtils.injectSymTab(seqMapFun, lambdaSymTab);
                 }));
             }
