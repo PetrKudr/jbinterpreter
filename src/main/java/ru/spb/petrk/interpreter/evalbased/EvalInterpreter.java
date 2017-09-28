@@ -88,7 +88,7 @@ public final class EvalInterpreter implements Interpreter {
             return false;
         }
         try {
-            interpret(program, new SymTab(), msg -> listener.onOut(msg));
+            interpret(program, new SymTabImpl(), msg -> listener.onOut(msg));
             return true;
         } catch (EvalInterruptedInterpreterException ex) {
             // Just return

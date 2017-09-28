@@ -20,25 +20,53 @@ import ru.spb.petrk.interpreter.evalbased.model.Evaluator;
  *
  * @author petrk
  */
-public final class SymTab {
-    
-    private final Map<String, Symbol> table = new HashMap<>(2);
+public interface SymTab {
     
     public static SymTab of(LambdaExpr lambda, Evaluator ... evals) {
         assert lambda.getParams().size() == evals.length;
-        SymTab st = new SymTab();
-        for (int i = 0; i < lambda.getParams().size(); ++i) {
-            st.putSym(lambda.getParams().get(i), evals[i]);
+        switch (evals.length) {
+            case 2:
+                return new ReduceLambdaSymTabImpl(lambda, evals[0], evals[1]);
+            case 1:
+                return new MapLambdaSymTabImpl(lambda, evals[0]);
+            default:
+                throw new AssertionError("Lambda with " + lambda.getParams().size() + " parameters?!");
         }
-        return st;
     } 
     
-    public Evaluator getEval(RefExpr expr) {
-        Symbol sym = table.get(expr.getName());
-        return sym != null && sym.offset < expr.getStart().getOffset() ? sym.eval : null;
-    }
+    /**
+     * Returns evaluator for the given reference.
+     * 
+     * @param expr
+     * @return evaluator
+     */
+    Evaluator getEval(RefExpr expr);
     
-    public <T extends Evaluator> T getEval(Class<T> cls, RefExpr expr) {
+    /**
+     * Puts evaluator for declared variable.
+     * 
+     * @param varDecl
+     * @param eval 
+     */
+    void putSym(VarDeclStmt varDecl, Evaluator eval);
+    
+    /**
+     * Puts evaluator for declared parameter.
+     * 
+     * @param paramDecl
+     * @param eval 
+     */
+    void putSym(ParamExpr paramDecl, Evaluator eval);
+    
+    /**
+     * Returns evaluator of the given type for the given reference.
+     * 
+     * @param <T>
+     * @param cls
+     * @param expr
+     * @return 
+     */
+    default <T extends Evaluator> T getEval(Class<T> cls, RefExpr expr) {
         Evaluator eval = getEval(expr);
         if (eval == null) {
             throw new EvalInterpreterException(reportError(
@@ -53,38 +81,5 @@ public final class SymTab {
             ));
         }
         return (T) eval;
-    }
-    
-    public void putSym(VarDeclStmt varDecl, Evaluator eval) {
-        putSym(varDecl.getName(), varDecl, eval);
-    } 
-    
-    public void putSym(ParamExpr paramDecl, Evaluator eval) {
-        putSym(paramDecl.getName(), paramDecl, eval);
-    }
-    
-    private void putSym(String name, AST decl, Evaluator eval) {
-        if (table.containsKey(name)) {
-            throw new EvalInterpreterException(reportError(
-                    "redeclaration of variable " + "\"" + name + "\"", 
-                    decl
-            ));
-        }
-        table.put(name, new Symbol(name, decl.getStart().getOffset(), eval));
-    }
-    
-    private static final class Symbol {
-        
-        public final String name;
-        
-        public final int offset;
-        
-        public final Evaluator eval;
-
-        public Symbol(String name, int offset, Evaluator eval) {
-            this.name = name;
-            this.offset = offset;
-            this.eval = eval;
-        }
     }
 }
