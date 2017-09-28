@@ -16,7 +16,7 @@ public class ASTInterpreterException extends RuntimeException {
     private final InterpreterError error;
 
     public ASTInterpreterException(InterpreterError error) {
-        super(error.getMessage());
+        super(error != null ? error.getMessage() : null);
         this.error = error;
     }
 
