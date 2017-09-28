@@ -6,6 +6,11 @@ Interpreter for the following language:
 * `stmt ::= var identifier = expr | out expr | print "string"`
 * `program ::= stmt | program stmt`
 
+**How to build and run**
+* `cd` to the project folder
+* `mvn install`
+* `mvn exec:java`
+
 **Interpreter requirements**
 * [x] Interpreter should report parsing errors and mismatched types errors (adding number to a sequence, applying map/reduce to a number, etc).
 * [x] Support of calculations on long sequences (millions of elements)
