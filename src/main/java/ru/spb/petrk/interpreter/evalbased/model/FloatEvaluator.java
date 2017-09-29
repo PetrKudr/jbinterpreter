@@ -14,7 +14,7 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
  * @author petrk
  */
 public interface FloatEvaluator extends NumberEvaluator {
-
+    
     /**
      * Computes value using state.
      * 
@@ -22,6 +22,9 @@ public interface FloatEvaluator extends NumberEvaluator {
      * @return double result
      */
     double value(SymTab symTab);
+    
+    @Override
+    FloatEvaluator binded(SymTab st);
 
     @Override
     public default FloatEvaluator asFloat() {

@@ -5,7 +5,9 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
@@ -16,12 +18,20 @@ import ru.spb.petrk.interpreter.evalbased.model.SequenceSequenceEvaluator;
  *
  * @author petrk
  */
-public final class SequenceSequenceEvaluatorImpl implements SequenceSequenceEvaluator {
+public final class MappedSequenceSequenceEvaluatorImpl<InSeq extends SequenceEvaluator> implements SequenceSequenceEvaluator {
     
-    private final Function<SymTab, Stream<SequenceEvaluator>> supplier;
+    private final InSeq base;
+    
+    private final BiFunction<InSeq, SymTab, Stream<SequenceEvaluator>> supplier;
 
-    public SequenceSequenceEvaluatorImpl(Function<SymTab, Stream<SequenceEvaluator>> supplier) {
+    public MappedSequenceSequenceEvaluatorImpl(InSeq base, BiFunction<InSeq, SymTab, Stream<SequenceEvaluator>> supplier) {
+        this.base = base;
         this.supplier = supplier;
+    }
+
+    @Override
+    public MappedSequenceSequenceEvaluatorImpl<InSeq> binded(SymTab st) {
+        return new MappedSequenceSequenceEvaluatorImpl<>((InSeq) base.binded(st), supplier);
     }
 
     @Override
@@ -29,6 +39,6 @@ public final class SequenceSequenceEvaluatorImpl implements SequenceSequenceEval
         if (Thread.interrupted()) {
             throw new EvalInterruptedInterpreterException();
         }
-        return supplier.apply(symTab);
+        return supplier.apply(base, symTab);
     }
 }

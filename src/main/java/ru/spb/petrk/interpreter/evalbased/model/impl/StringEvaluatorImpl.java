@@ -7,6 +7,7 @@ package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
+import ru.spb.petrk.interpreter.evalbased.model.Evaluator;
 import ru.spb.petrk.interpreter.evalbased.model.StringEvaluator;
 
 /**
@@ -19,6 +20,11 @@ public final class StringEvaluatorImpl implements StringEvaluator {
 
     public StringEvaluatorImpl(String value) {
         this.value = value;
+    }
+
+    @Override
+    public Evaluator binded(SymTab st) {
+        return this;
     }
 
     @Override

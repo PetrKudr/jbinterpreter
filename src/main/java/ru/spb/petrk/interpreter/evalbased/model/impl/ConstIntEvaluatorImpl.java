@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import ru.spb.petrk.interpreter.evalbased.SymTab;
+import ru.spb.petrk.interpreter.evalbased.model.Evaluator;
 import ru.spb.petrk.interpreter.evalbased.model.FloatEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
 
@@ -19,6 +20,11 @@ public final class ConstIntEvaluatorImpl implements IntEvaluator {
 
     public ConstIntEvaluatorImpl(int value) {
         this.value = value;
+    }
+
+    @Override
+    public IntEvaluator binded(SymTab st) {
+        return this;
     }
 
     @Override

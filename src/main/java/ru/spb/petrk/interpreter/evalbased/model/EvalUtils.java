@@ -6,30 +6,12 @@
 package ru.spb.petrk.interpreter.evalbased.model;
 
 import ru.spb.petrk.ast.*;
-import ru.spb.petrk.interpreter.evalbased.SymTab;
-import ru.spb.petrk.interpreter.evalbased.model.impl.FloatSequenceEvaluatorImpl;
-import ru.spb.petrk.interpreter.evalbased.model.impl.IntSequenceEvaluatorImpl;
-import ru.spb.petrk.interpreter.evalbased.model.impl.SequenceSequenceEvaluatorImpl;
 
 /**
  *
  * @author petrk
  */
 public final class EvalUtils {
-    
-    public static SequenceEvaluator injectSymTab(SequenceEvaluator eval, SymTab st) {
-        if (EvalKindUtils.isIntSequenceEval(eval)) {
-            IntSequenceEvaluator intSeqEval = (IntSequenceEvaluator) eval;
-            return new IntSequenceEvaluatorImpl((any) -> intSeqEval.stream(st));
-        } else if (EvalKindUtils.isIntSequenceEval(eval)) {
-            FloatSequenceEvaluator floatSeqEval = (FloatSequenceEvaluator) eval;
-            return new FloatSequenceEvaluatorImpl((any) -> floatSeqEval.stream(st));
-        } else if (EvalKindUtils.isSequenceSequenceEval(eval)) {
-            SequenceSequenceEvaluator seqSeqEval = (SequenceSequenceEvaluator) eval;
-            return new SequenceSequenceEvaluatorImpl((any) -> seqSeqEval.stream(st));
-        }
-        throw new AssertionError("Unexpected kind of evaluator: " + eval.getClass());
-    }
     
     public static String getEvalTypeName(Class<? extends Evaluator> cls) {
         if (IntEvaluator.class.isAssignableFrom(cls)) {

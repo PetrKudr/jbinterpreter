@@ -13,7 +13,7 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
  * @author petrk
  */
 public interface IntEvaluator extends NumberEvaluator {
-
+    
     /**
      * Computes value using state.
      * 
@@ -22,6 +22,9 @@ public interface IntEvaluator extends NumberEvaluator {
      */
     int value(SymTab symTab);
 
+    @Override
+    IntEvaluator binded(SymTab st);
+    
     @Override
     public default IntEvaluator asInt() {
         return this;

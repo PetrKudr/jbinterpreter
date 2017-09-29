@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model;
 
 import java.util.stream.Stream;
+import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
  * Represents evaluator for a sequence of sequences.
@@ -13,5 +14,7 @@ import java.util.stream.Stream;
  * @author petrk
  */
 public interface SequenceSequenceEvaluator extends SequenceEvaluator<Stream<SequenceEvaluator>> {
-    // marker interface
+    
+    @Override
+    SequenceSequenceEvaluator binded(SymTab st);
 }

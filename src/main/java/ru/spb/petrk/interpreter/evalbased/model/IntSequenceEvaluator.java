@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model;
 
 import java.util.stream.IntStream;
+import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
  * Represents evaluator for a sequence of integers.
@@ -13,6 +14,9 @@ import java.util.stream.IntStream;
  * @author petrk
  */
 public interface IntSequenceEvaluator extends NumberSequenceEvaluator<IntStream> {
+
+    @Override
+    IntSequenceEvaluator binded(SymTab st);
 
     @Override
     default IntSequenceEvaluator asIntSequence() {

@@ -22,6 +22,25 @@ public final class FloatEvaluatorImpl implements FloatEvaluator {
     public FloatEvaluatorImpl(ToDoubleFunction<SymTab> supplier) {
         this.supplier = supplier;
     }
+    
+    @Override
+    public FloatEvaluator binded(final SymTab st) {
+        return new FloatEvaluatorImpl(new ToDoubleFunction<SymTab>() {
+            
+            private boolean evaluated = false;
+            
+            private double val;
+            
+            @Override
+            public double applyAsDouble(SymTab value) {
+                if (!evaluated) {
+                    val = supplier.applyAsDouble(st);
+                    evaluated = true;
+                }
+                return val;
+            }
+        });
+    }
 
     @Override
     public double value(SymTab symTab) {

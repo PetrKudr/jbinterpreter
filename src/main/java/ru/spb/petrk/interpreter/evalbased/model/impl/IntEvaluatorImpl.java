@@ -8,6 +8,7 @@ package ru.spb.petrk.interpreter.evalbased.model.impl;
 import java.util.function.ToIntFunction;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
+import ru.spb.petrk.interpreter.evalbased.model.Evaluator;
 import ru.spb.petrk.interpreter.evalbased.model.FloatEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
 
@@ -21,6 +22,25 @@ public final class IntEvaluatorImpl implements IntEvaluator {
 
     public IntEvaluatorImpl(ToIntFunction<SymTab> supplier) {
         this.supplier = supplier;
+    }
+
+    @Override
+    public IntEvaluator binded(final SymTab st) {
+        return new IntEvaluatorImpl(new ToIntFunction<SymTab>() {
+            
+            private boolean evaluated = false;
+            
+            private int val;
+            
+            @Override
+            public int applyAsInt(SymTab value) {
+                if (!evaluated) {
+                    val = supplier.applyAsInt(st);
+                    evaluated = true;
+                }
+                return val;
+            }
+        });
     }
 
     @Override

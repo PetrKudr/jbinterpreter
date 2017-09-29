@@ -6,6 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model;
 
 import java.util.stream.DoubleStream;
+import ru.spb.petrk.interpreter.evalbased.SymTab;
 
 /**
  * Represents evaluator for a sequence of floats.
@@ -14,6 +15,9 @@ import java.util.stream.DoubleStream;
  */
 public interface FloatSequenceEvaluator extends NumberSequenceEvaluator<DoubleStream> {
 
+    @Override
+    FloatSequenceEvaluator binded(SymTab st);
+    
     @Override
     default FloatSequenceEvaluator asFloatSequence() {
         return this;

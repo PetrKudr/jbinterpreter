@@ -20,20 +20,20 @@ import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
  *
  * @author petrk
  */
-public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
+public final class MappedIntSequenceEvaluatorImpl<InSeq extends SequenceEvaluator> implements IntSequenceEvaluator {
     
-    private final IntEvaluator left;
+    private final InSeq base;
     
-    private final IntEvaluator right;
+    private final BiFunction<InSeq, SymTab, IntStream> supplier;
 
-    public IntSequenceEvaluatorImpl(IntEvaluator left, IntEvaluator right) {
-        this.left = left;
-        this.right = right;
+    public MappedIntSequenceEvaluatorImpl(InSeq base, BiFunction<InSeq, SymTab, IntStream> supplier) {
+        this.base = base;
+        this.supplier = supplier;
     }
 
     @Override
-    public IntSequenceEvaluator binded(SymTab st) {
-        return new IntSequenceEvaluatorImpl(left.binded(st), right.binded(st));
+    public MappedIntSequenceEvaluatorImpl<InSeq> binded(SymTab st) {
+        return new MappedIntSequenceEvaluatorImpl<>((InSeq) base.binded(st), supplier);
     }
 
     @Override
@@ -41,13 +41,13 @@ public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
         if (Thread.interrupted()) {
             throw new EvalInterruptedInterpreterException();
         }
-        return IntStream.rangeClosed(left.value(symTab), right.value(symTab));
+        return supplier.apply(base, symTab);
     }
     
     @Override
     public FloatSequenceEvaluator asFloatSequence() {
-        return new MappedFloatSequenceEvaluatorImpl<>(this, (base, st) -> 
-                base.stream(st).mapToDouble(intVal -> intVal)
+        return new MappedFloatSequenceEvaluatorImpl<>(this, (baseEval, st) -> 
+                baseEval.stream(st).mapToDouble(intVal -> intVal)
         );
     }
 }

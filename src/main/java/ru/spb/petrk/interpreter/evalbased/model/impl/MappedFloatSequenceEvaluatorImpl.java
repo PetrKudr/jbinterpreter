@@ -7,12 +7,11 @@ package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
-import ru.spb.petrk.interpreter.evalbased.model.Evaluator;
 import ru.spb.petrk.interpreter.evalbased.model.FloatSequenceEvaluator;
-import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.IntSequenceEvaluator;
 import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
 
@@ -20,34 +19,34 @@ import ru.spb.petrk.interpreter.evalbased.model.SequenceEvaluator;
  *
  * @author petrk
  */
-public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
+public final class MappedFloatSequenceEvaluatorImpl<InSeq extends SequenceEvaluator> implements FloatSequenceEvaluator {
     
-    private final IntEvaluator left;
+    private final InSeq base;
     
-    private final IntEvaluator right;
+    private final BiFunction<InSeq, SymTab, DoubleStream> supplier;
 
-    public IntSequenceEvaluatorImpl(IntEvaluator left, IntEvaluator right) {
-        this.left = left;
-        this.right = right;
+    public MappedFloatSequenceEvaluatorImpl(InSeq base, BiFunction<InSeq, SymTab, DoubleStream> supplier) {
+        this.base = base;
+        this.supplier = supplier;
     }
 
     @Override
-    public IntSequenceEvaluator binded(SymTab st) {
-        return new IntSequenceEvaluatorImpl(left.binded(st), right.binded(st));
+    public MappedFloatSequenceEvaluatorImpl<InSeq> binded(SymTab st) {
+        return new MappedFloatSequenceEvaluatorImpl<>((InSeq) base.binded(st), supplier);
     }
 
     @Override
-    public IntStream stream(SymTab symTab) {
+    public DoubleStream stream(SymTab symTab) {
         if (Thread.interrupted()) {
             throw new EvalInterruptedInterpreterException();
         }
-        return IntStream.rangeClosed(left.value(symTab), right.value(symTab));
+        return supplier.apply(base, symTab);
     }
-    
+
     @Override
-    public FloatSequenceEvaluator asFloatSequence() {
-        return new MappedFloatSequenceEvaluatorImpl<>(this, (base, st) -> 
-                base.stream(st).mapToDouble(intVal -> intVal)
+    public IntSequenceEvaluator asIntSequence() {
+        return new MappedIntSequenceEvaluatorImpl<>(this, (baseEval, st) -> 
+                baseEval.stream(st).mapToInt(dblVal -> Double.valueOf(dblVal).intValue())
         );
     }
 }
