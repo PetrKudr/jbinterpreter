@@ -8,6 +8,7 @@ package ru.spb.petrk.interpreter.astbased.model.impl;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.interpreter.astbased.ASTInterpreter;
@@ -20,11 +21,14 @@ import ru.spb.petrk.interpreter.astbased.model.Value;
  */
 public final class MapSequenceValue implements SequenceValue {
     
-    final SequenceValue sequence;
+    private final AtomicBoolean canceller;
     
-    final LambdaExpr lambda;
+    private final SequenceValue sequence;
+    
+    private final LambdaExpr lambda;
 
-    public MapSequenceValue(SequenceValue sequence, LambdaExpr lambda) {
+    public MapSequenceValue(AtomicBoolean canceller, SequenceValue sequence, LambdaExpr lambda) {
+        this.canceller = canceller;
         this.sequence = sequence;
         this.lambda = lambda;
     }
@@ -42,7 +46,8 @@ public final class MapSequenceValue implements SequenceValue {
             public Value next() {
                 return new ASTInterpreter().interpret(
                         lambda.getBody(), 
-                        symTabOf(orig.next())
+                        symTabOf(orig.next()),
+                        canceller
                 );
             }
         };
@@ -52,7 +57,8 @@ public final class MapSequenceValue implements SequenceValue {
     public Stream<Value> stream() {
         return sequence.stream().map(val -> new ASTInterpreter().interpret(
                 lambda.getBody(),
-                symTabOf(val)
+                symTabOf(val),
+                canceller
         ));
     }
 

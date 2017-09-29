@@ -29,9 +29,6 @@ public final class StringEvaluatorImpl implements StringEvaluator {
 
     @Override
     public String value(SymTab symTab) {
-        if (Thread.interrupted()) {
-            throw new EvalInterruptedInterpreterException();
-        }
         return value;
     }
     

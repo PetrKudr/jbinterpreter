@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 import junit.framework.TestCase;
 
 /**
@@ -23,7 +24,7 @@ public abstract class AbstractInterpreterTest extends TestCase {
         final Charset charset = StandardCharsets.UTF_8;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PrintStream ps = new PrintStream(baos, true, charset.name())) {
-            createInterpreter().interpret(input, ps, ps);
+            createInterpreter().interpret(input, ps, ps, new AtomicBoolean(false));
             return new String(baos.toByteArray(), charset);
         } catch (UnsupportedEncodingException ex) {
             return "UTF8 is not supported?";

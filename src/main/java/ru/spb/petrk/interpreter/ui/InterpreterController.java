@@ -20,14 +20,18 @@ public class InterpreterController {
     
     private final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     
+    private ShowInterpretationTask lastTask;
+    
     private ScheduledFuture<?> lastTaskFuture;
     
     public void post(ShowInterpretationTask task) {
         assert SwingUtilities.isEventDispatchThread();
-        if (lastTaskFuture != null) {
-            lastTaskFuture.cancel(true);
+        if (lastTask != null) {
+            assert lastTaskFuture != null;
+            lastTaskFuture.cancel(false); // no need to interrupt thread, that will be done via canceller
+            lastTask.cancel();
         }
+        lastTask = task;
         lastTaskFuture = service.schedule(task, 250, TimeUnit.MILLISECONDS);
-        task.setTaskFuture(lastTaskFuture);
     }
 }

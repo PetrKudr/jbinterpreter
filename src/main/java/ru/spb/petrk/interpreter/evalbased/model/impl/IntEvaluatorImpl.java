@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.ToIntFunction;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
@@ -17,10 +18,13 @@ import ru.spb.petrk.interpreter.evalbased.model.IntEvaluator;
  */
 public final class IntEvaluatorImpl implements IntEvaluator {
     
+    private final AtomicBoolean canceller;
+    
     private final ToIntFunction<SymTab> supplier;
 
-    public IntEvaluatorImpl(ToIntFunction<SymTab> supplier) {
+    public IntEvaluatorImpl(AtomicBoolean canceller, ToIntFunction<SymTab> supplier) {
         this.supplier = supplier;
+        this.canceller = canceller;
     }
 
     @Override
@@ -30,7 +34,7 @@ public final class IntEvaluatorImpl implements IntEvaluator {
 
     @Override
     public int value(SymTab symTab) {
-        if (Thread.interrupted()) {
+        if (canceller.get()) {
             throw new EvalInterruptedInterpreterException();
         }
         return supplier.applyAsInt(symTab);
@@ -38,7 +42,7 @@ public final class IntEvaluatorImpl implements IntEvaluator {
     
     @Override
     public FloatEvaluator asFloat() {
-        return new FloatEvaluatorImpl((SymTab symTab) -> this.value(symTab));
+        return new FloatEvaluatorImpl(canceller, (SymTab symTab) -> this.value(symTab));
     }
     
     @Override

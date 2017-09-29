@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -31,6 +32,8 @@ public class ShowInterpretationTask implements Runnable {
     
     private final static Logger LOG = Logger.getLogger(ShowInterpretationTask.class.getName());
     
+    private final AtomicBoolean canceller = new AtomicBoolean();
+    
     private final String text;
     
     private final RSyntaxTextArea input;
@@ -38,8 +41,6 @@ public class ShowInterpretationTask implements Runnable {
     private final JTextArea output; 
     
     private final Interpreter interpreter;
-    
-    private volatile Future<?> taskFuture;
 
     public ShowInterpretationTask(RSyntaxTextArea input, JTextArea output, Interpreter interpreter) {
         this.text = input.getText();
@@ -47,9 +48,9 @@ public class ShowInterpretationTask implements Runnable {
         this.output = output;
         this.interpreter = interpreter;
     }
-    
-    public void setTaskFuture(Future<?> taskFuture) {
-        this.taskFuture = taskFuture;
+
+    public void cancel() {
+        canceller.set(true);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ShowInterpretationTask implements Runnable {
                         highlightError(input, error);
                     });
                 }
-            });
+            }, canceller);
         } catch (Throwable thr) {
             LOG.log(Level.INFO, thr.getMessage(), thr);
         }
@@ -150,7 +151,7 @@ public class ShowInterpretationTask implements Runnable {
             if (charsWritten == Integer.MAX_VALUE) {
                 charsWritten = 0; // corner case, reset counter
             }
-            if (charsWritten > OUTPUT_THRESHOLD && taskFuture != null) {
+            if (charsWritten > OUTPUT_THRESHOLD) {
                 Component topComponent = output;
                 while (topComponent.getParent() != null) {
                     topComponent = topComponent.getParent();
@@ -159,9 +160,7 @@ public class ShowInterpretationTask implements Runnable {
                         topComponent, 
                         "Interpretation prints a lot of data. Do you want to cancel interpretation?"
                 )) {
-                    if (!taskFuture.isCancelled()) {
-                        taskFuture.cancel(true); // cancel our task
-                    }
+                    canceller.set(true);
                     charsWritten = -1; // prevent potential future writings
                     return;
                 } else {

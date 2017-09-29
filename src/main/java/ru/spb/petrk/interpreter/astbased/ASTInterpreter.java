@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import ru.spb.petrk.ast.AST;
 import ru.spb.petrk.ast.ASTUtils;
 import ru.spb.petrk.ast.ASTUtils.ParserError;
@@ -59,7 +60,7 @@ import ru.spb.petrk.interpreter.astbased.model.impl.VoidValueImpl;
 public final class ASTInterpreter implements Interpreter {
     
     @Override
-    public boolean interpret(String input, final PrintStream out, final PrintStream err) {
+    public boolean interpret(String input, final PrintStream out, final PrintStream err, AtomicBoolean canceller) {
         return interpret(input, new InterpreterListener() {
             @Override
             public void onOut(String msg) {
@@ -70,11 +71,11 @@ public final class ASTInterpreter implements Interpreter {
             public void onError(InterpreterError error) {
                 err.println(error.toString());
             }
-        });
+        }, canceller);
     }
     
     @Override
-    public boolean interpret(String input, InterpreterListener listener) {
+    public boolean interpret(String input, InterpreterListener listener, AtomicBoolean canceller) {
         List<ASTUtils.ParserError> parseOrLexErrors = new ArrayList<>();
         ProgramStmt program = ASTUtils.parse(input, parseOrLexErrors);
         if (program == null) {
@@ -84,7 +85,7 @@ public final class ASTInterpreter implements Interpreter {
             return false;
         }
         try {
-            interpret(program, new HashMap<>(), (msg) -> listener.onOut(msg));
+            interpret(program, new HashMap<>(), (msg) -> listener.onOut(msg), canceller);
             return true;
         } catch (ASTInterruptedInterpreterException ex) {
             // Just return
@@ -103,14 +104,15 @@ public final class ASTInterpreter implements Interpreter {
      * 
      * @param code
      * @param symTable
+     * @param canceller
      * 
      * @throws ASTInterpreterException
      * @throws ASTInterruptedInterpreterException
      * 
      * @return value of the code (void value if code doesn't return value)
      */
-    public Value interpret(AST code, Map<String, Value> symTable) {
-        return interpret(code, symTable, null);
+    public Value interpret(AST code, Map<String, Value> symTable, AtomicBoolean canceller) {
+        return interpret(code, symTable, null, canceller);
     }
     
     /**
@@ -122,14 +124,15 @@ public final class ASTInterpreter implements Interpreter {
      * @param code
      * @param symTable
      * @param listener
+     * @param canceller
      * 
      * @throws ASTInterpreterException
      * @throws ASTInterruptedInterpreterException
      * 
      * @return value of the code (void value if code doesn't return value)
      */
-    public Value interpret(AST code, Map<String, Value> symTable, ASTInterpreterListener listener) {
-        return new InterpretVisitor(listener, symTable).eval(code);
+    public Value interpret(AST code, Map<String, Value> symTable, ASTInterpreterListener listener, AtomicBoolean canceller) {
+        return new InterpretVisitor(listener, symTable, canceller).eval(code);
     }
     
     private static InterpreterError toInterpretError(ParserError parseError) {
@@ -144,18 +147,21 @@ public final class ASTInterpreter implements Interpreter {
     
     private static final class InterpretVisitor implements ASTVisitor<Value> {
         
+        private final AtomicBoolean canceller;
+        
         private final ASTInterpreterListener listener;
         
         private final Map<String, Value> symTab;
 
-        public InterpretVisitor(ASTInterpreterListener listener, Map<String, Value> symTab) {
+        public InterpretVisitor(ASTInterpreterListener listener, Map<String, Value> symTab, AtomicBoolean canceller) {
             this.listener = listener;
             this.symTab = symTab;
+            this.canceller = canceller;
         }
 
         @Override
         public Value visit(AST ast) {
-            if (Thread.interrupted()) {
+            if (canceller.get()) {
                 throw new ASTInterruptedInterpreterException();
             }
             return ASTVisitor.super.visit(ast);
@@ -231,7 +237,7 @@ public final class ASTInterpreter implements Interpreter {
         @Override
         public Value visitMapOperator(MapOperator op) {
             SequenceValue seq = eval(SequenceValue.class, op.getSequence());
-            return new MapSequenceValue(seq, op.getLambda());
+            return new MapSequenceValue(canceller, seq, op.getLambda());
         }
 
         @Override
@@ -244,7 +250,8 @@ public final class ASTInterpreter implements Interpreter {
                 lambdaSymTab.put(op.getLambda().getParams().get(1).getName(), right);
                 return new ASTInterpreter().interpret(
                         op.getLambda().getBody(), 
-                        lambdaSymTab
+                        lambdaSymTab,
+                        canceller
                 );
             });
             return reduced;

@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
@@ -19,20 +20,23 @@ import ru.spb.petrk.interpreter.evalbased.model.SequenceSequenceEvaluator;
  */
 public final class SymTabSequenceSequenceEvaluatorImpl implements SequenceSequenceEvaluator {
     
+    private final AtomicBoolean canceller;
+    
     private final Function<SymTab, SequenceSequenceEvaluator> supplier;
 
-    public SymTabSequenceSequenceEvaluatorImpl(Function<SymTab, SequenceSequenceEvaluator> supplier) {
+    public SymTabSequenceSequenceEvaluatorImpl(AtomicBoolean canceller, Function<SymTab, SequenceSequenceEvaluator> supplier) {
+        this.canceller = canceller;
         this.supplier = supplier;
     }
 
     @Override
     public SymTabSequenceSequenceEvaluatorImpl bind(SymTab st) {
-        return new SymTabSequenceSequenceEvaluatorImpl((any) -> supplier.apply(st).bind(st));
+        return new SymTabSequenceSequenceEvaluatorImpl(canceller, (any) -> supplier.apply(st).bind(st));
     }
 
     @Override
     public Stream<SequenceEvaluator> stream(SymTab symTab) {
-        if (Thread.interrupted()) {
+        if (canceller.get()) {
             throw new EvalInterruptedInterpreterException();
         }
         return supplier.apply(symTab).stream(symTab);

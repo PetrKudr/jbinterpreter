@@ -5,6 +5,7 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
@@ -18,23 +19,26 @@ import ru.spb.petrk.interpreter.evalbased.model.IntSequenceEvaluator;
  */
 public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
     
+    private final AtomicBoolean canceller;
+    
     private final IntEvaluator left;
     
     private final IntEvaluator right;
 
-    public IntSequenceEvaluatorImpl(IntEvaluator left, IntEvaluator right) {
+    public IntSequenceEvaluatorImpl(AtomicBoolean canceller, IntEvaluator left, IntEvaluator right) {
+        this.canceller = canceller;
         this.left = left;
         this.right = right;
     }
 
     @Override
     public IntSequenceEvaluator bind(SymTab st) {
-        return new IntSequenceEvaluatorImpl(left.bind(st), right.bind(st));
+        return new IntSequenceEvaluatorImpl(canceller, left.bind(st), right.bind(st));
     }
 
     @Override
     public IntStream stream(SymTab symTab) {
-        if (Thread.interrupted()) {
+        if (canceller.get()) {
             throw new EvalInterruptedInterpreterException();
         }
         return IntStream.rangeClosed(left.value(symTab), right.value(symTab));
@@ -42,7 +46,7 @@ public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
     
     @Override
     public FloatSequenceEvaluator asFloatSequence() {
-        return new MappedFloatSequenceEvaluatorImpl<>(this, (base, st) -> 
+        return new MappedFloatSequenceEvaluatorImpl<>(canceller, this, (base, st) -> 
                 base.stream(st).mapToDouble(intVal -> intVal)
         );
     }
