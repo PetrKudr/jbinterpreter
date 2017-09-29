@@ -22,7 +22,7 @@ public final class ConstFloatEvaluatorImpl implements FloatEvaluator {
     }
 
     @Override
-    public FloatEvaluator binded(SymTab st) {
+    public FloatEvaluator bind(SymTab st) {
         return this;
     }
 

@@ -17,7 +17,7 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
 public interface Evaluator {
     
     /**
-     * Creates evaluator which is binded to the given symtab.
+     * Creates evaluator which is bound to the given symtab.
      * 
      * That makes returned evaluator effectively constant.
      * 
@@ -29,7 +29,7 @@ public interface Evaluator {
      * @param st
      * @return binded evaluator
      */
-    Evaluator binded(SymTab st);
+    Evaluator bind(SymTab st);
     
     /**
      * Returns string representation of the evaluator with the given symtab.

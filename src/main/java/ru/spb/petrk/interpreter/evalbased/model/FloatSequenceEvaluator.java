@@ -16,7 +16,7 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
 public interface FloatSequenceEvaluator extends NumberSequenceEvaluator<DoubleStream> {
 
     @Override
-    FloatSequenceEvaluator binded(SymTab st);
+    FloatSequenceEvaluator bind(SymTab st);
     
     @Override
     default FloatSequenceEvaluator asFloatSequence() {

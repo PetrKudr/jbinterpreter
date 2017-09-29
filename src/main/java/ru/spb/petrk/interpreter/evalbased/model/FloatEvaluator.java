@@ -24,7 +24,7 @@ public interface FloatEvaluator extends NumberEvaluator {
     double value(SymTab symTab);
     
     @Override
-    FloatEvaluator binded(SymTab st);
+    FloatEvaluator bind(SymTab st);
 
     @Override
     public default FloatEvaluator asFloat() {

@@ -20,7 +20,7 @@ public final class VoidEvaluatorImpl implements VoidEvaluator {
     private VoidEvaluatorImpl() {}
 
     @Override
-    public Evaluator binded(SymTab st) {
+    public Evaluator bind(SymTab st) {
         return this;
     }
 

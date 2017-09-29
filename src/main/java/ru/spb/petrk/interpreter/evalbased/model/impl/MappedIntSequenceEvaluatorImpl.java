@@ -29,8 +29,8 @@ public final class MappedIntSequenceEvaluatorImpl<InSeq extends SequenceEvaluato
     }
 
     @Override
-    public MappedIntSequenceEvaluatorImpl<InSeq> binded(SymTab st) {
-        return new MappedIntSequenceEvaluatorImpl<>((InSeq) base.binded(st), supplier);
+    public MappedIntSequenceEvaluatorImpl<InSeq> bind(SymTab st) {
+        return new MappedIntSequenceEvaluatorImpl<>((InSeq) base.bind(st), supplier);
     }
 
     @Override

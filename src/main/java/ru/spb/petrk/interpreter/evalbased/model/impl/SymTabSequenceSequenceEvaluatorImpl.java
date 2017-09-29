@@ -26,8 +26,8 @@ public final class SymTabSequenceSequenceEvaluatorImpl implements SequenceSequen
     }
 
     @Override
-    public SymTabSequenceSequenceEvaluatorImpl binded(SymTab st) {
-        return new SymTabSequenceSequenceEvaluatorImpl((any) -> supplier.apply(st).binded(st));
+    public SymTabSequenceSequenceEvaluatorImpl bind(SymTab st) {
+        return new SymTabSequenceSequenceEvaluatorImpl((any) -> supplier.apply(st).bind(st));
     }
 
     @Override

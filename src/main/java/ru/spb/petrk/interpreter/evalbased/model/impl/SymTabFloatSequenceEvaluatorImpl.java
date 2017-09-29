@@ -26,8 +26,8 @@ public class SymTabFloatSequenceEvaluatorImpl implements FloatSequenceEvaluator 
     }
 
     @Override
-    public SymTabFloatSequenceEvaluatorImpl binded(SymTab st) {
-        return new SymTabFloatSequenceEvaluatorImpl((any) -> supplier.apply(st).binded(st));
+    public SymTabFloatSequenceEvaluatorImpl bind(SymTab st) {
+        return new SymTabFloatSequenceEvaluatorImpl((any) -> supplier.apply(st).bind(st));
     }
 
     @Override

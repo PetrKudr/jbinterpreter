@@ -25,7 +25,7 @@ public interface SequenceEvaluator<S extends BaseStream> extends Evaluator {
     S stream(SymTab symTab);
 
     @Override
-    SequenceEvaluator binded(SymTab st);
+    SequenceEvaluator bind(SymTab st);
 
     @Override
     default String asString(SymTab symTab) {

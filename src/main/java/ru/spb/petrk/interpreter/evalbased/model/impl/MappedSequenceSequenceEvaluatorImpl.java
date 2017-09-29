@@ -28,8 +28,8 @@ public final class MappedSequenceSequenceEvaluatorImpl<InSeq extends SequenceEva
     }
 
     @Override
-    public MappedSequenceSequenceEvaluatorImpl<InSeq> binded(SymTab st) {
-        return new MappedSequenceSequenceEvaluatorImpl<>((InSeq) base.binded(st), supplier);
+    public MappedSequenceSequenceEvaluatorImpl<InSeq> bind(SymTab st) {
+        return new MappedSequenceSequenceEvaluatorImpl<>((InSeq) base.bind(st), supplier);
     }
 
     @Override

@@ -24,7 +24,7 @@ public final class FloatEvaluatorImpl implements FloatEvaluator {
     }
     
     @Override
-    public FloatEvaluator binded(final SymTab st) {
+    public FloatEvaluator bind(final SymTab st) {
         return new ConstFloatEvaluatorImpl(value(st));
     }
 

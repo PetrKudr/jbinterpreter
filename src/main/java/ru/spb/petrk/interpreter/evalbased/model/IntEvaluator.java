@@ -23,7 +23,7 @@ public interface IntEvaluator extends NumberEvaluator {
     int value(SymTab symTab);
 
     @Override
-    IntEvaluator binded(SymTab st);
+    IntEvaluator bind(SymTab st);
     
     @Override
     public default IntEvaluator asInt() {

@@ -343,21 +343,21 @@ public final class EvalInterpreter implements Interpreter {
                 final IntSequenceEvaluator intInput = (IntSequenceEvaluator) input;
                 return new MappedSequenceSequenceEvaluatorImpl<>(intInput, (in, st) -> in.stream(st).mapToObj((val) -> {
                     SymTab lambdaSymTab = SymTab.of(lambda, new ConstIntEvaluatorImpl(val));
-                    return seqMapFun.binded(lambdaSymTab);
+                    return seqMapFun.bind(lambdaSymTab);
                 }));
             } else if (isFloatSequenceEval(input)) {
                 // Case 3.2: {{...},...,{...}} map({doubles}, double -> {...})
                 final FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new MappedSequenceSequenceEvaluatorImpl<>(floatInput, (in, st) -> in.stream(st).mapToObj((val) -> {
                     SymTab lambdaSymTab = SymTab.of(lambda, new ConstFloatEvaluatorImpl(val));
-                    return seqMapFun.binded(lambdaSymTab);
+                    return seqMapFun.bind(lambdaSymTab);
                 }));
             } else {
                 // Case 3.3: {{...},...,{...}} map({{...}, {...}}, {...} -> {...})
                 SequenceSequenceEvaluator seqInput = (SequenceSequenceEvaluator) input;
                 return new MappedSequenceSequenceEvaluatorImpl<>(seqInput, (in, st) -> in.stream(st).map((val) -> {
                     SymTab lambdaSymTab = SymTab.of(lambda, val);
-                    return seqMapFun.binded(lambdaSymTab);
+                    return seqMapFun.bind(lambdaSymTab);
                 }));
             }
         }
@@ -481,21 +481,21 @@ public final class EvalInterpreter implements Interpreter {
                     return new MappedIntSequenceEvaluatorImpl<>(seqInput, (in, st) ->
                             ((IntSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
-                                return reduce.binded(symTab);
+                                return reduce.bind(symTab);
                             })).stream(st)
                     );
                 } else if (EvalKindUtils.isFloatSequenceEval(reduce)) {
                     return new MappedFloatSequenceEvaluatorImpl<>(seqInput, (in, st) ->
                             ((FloatSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
-                                return reduce.binded(symTab);
+                                return reduce.bind(symTab);
                             })).stream(st)
                     );
                 } else if (EvalKindUtils.isSequenceSequenceEval(reduce)) {
                     return new MappedSequenceSequenceEvaluatorImpl<>(seqInput, (in, st) ->
                             ((SequenceSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
-                                return reduce.binded(symTab);
+                                return reduce.bind(symTab);
                             })).stream(st)
                     );
                 } else {

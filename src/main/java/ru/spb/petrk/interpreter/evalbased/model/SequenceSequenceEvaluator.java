@@ -16,5 +16,5 @@ import ru.spb.petrk.interpreter.evalbased.SymTab;
 public interface SequenceSequenceEvaluator extends SequenceEvaluator<Stream<SequenceEvaluator>> {
     
     @Override
-    SequenceSequenceEvaluator binded(SymTab st);
+    SequenceSequenceEvaluator bind(SymTab st);
 }

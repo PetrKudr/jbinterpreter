@@ -28,8 +28,8 @@ public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
     }
 
     @Override
-    public IntSequenceEvaluator binded(SymTab st) {
-        return new IntSequenceEvaluatorImpl(left.binded(st), right.binded(st));
+    public IntSequenceEvaluator bind(SymTab st) {
+        return new IntSequenceEvaluatorImpl(left.bind(st), right.bind(st));
     }
 
     @Override

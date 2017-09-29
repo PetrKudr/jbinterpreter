@@ -23,7 +23,7 @@ public final class StringEvaluatorImpl implements StringEvaluator {
     }
 
     @Override
-    public Evaluator binded(SymTab st) {
+    public Evaluator bind(SymTab st) {
         return this;
     }
 

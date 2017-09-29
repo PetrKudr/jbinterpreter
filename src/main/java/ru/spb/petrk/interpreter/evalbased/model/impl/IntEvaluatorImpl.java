@@ -24,7 +24,7 @@ public final class IntEvaluatorImpl implements IntEvaluator {
     }
 
     @Override
-    public IntEvaluator binded(final SymTab st) {
+    public IntEvaluator bind(final SymTab st) {
         return new ConstIntEvaluatorImpl(value(st));
     }
 
