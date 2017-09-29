@@ -25,21 +25,7 @@ public final class FloatEvaluatorImpl implements FloatEvaluator {
     
     @Override
     public FloatEvaluator binded(final SymTab st) {
-        return new FloatEvaluatorImpl(new ToDoubleFunction<SymTab>() {
-            
-            private boolean evaluated = false;
-            
-            private double val;
-            
-            @Override
-            public double applyAsDouble(SymTab value) {
-                if (!evaluated) {
-                    val = supplier.applyAsDouble(st);
-                    evaluated = true;
-                }
-                return val;
-            }
-        });
+        return new ConstFloatEvaluatorImpl(value(st));
     }
 
     @Override

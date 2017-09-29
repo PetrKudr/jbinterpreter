@@ -25,21 +25,7 @@ public final class IntEvaluatorImpl implements IntEvaluator {
 
     @Override
     public IntEvaluator binded(final SymTab st) {
-        return new IntEvaluatorImpl(new ToIntFunction<SymTab>() {
-            
-            private boolean evaluated = false;
-            
-            private int val;
-            
-            @Override
-            public int applyAsInt(SymTab value) {
-                if (!evaluated) {
-                    val = supplier.applyAsInt(st);
-                    evaluated = true;
-                }
-                return val;
-            }
-        });
+        return new ConstIntEvaluatorImpl(value(st));
     }
 
     @Override

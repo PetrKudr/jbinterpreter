@@ -21,6 +21,11 @@ public interface Evaluator {
      * 
      * That makes returned evaluator effectively constant.
      * 
+     * Tip: Implementations should evaluate value immediately, because 
+     * there is no point to defer evaluation further. Also, in case of deferred
+     * evaluation there could be stack overflow issues if calculations are
+     * chained.
+     * 
      * @param st
      * @return binded evaluator
      */
