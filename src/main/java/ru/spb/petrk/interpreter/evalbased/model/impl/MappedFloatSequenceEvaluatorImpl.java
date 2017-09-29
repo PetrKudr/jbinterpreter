@@ -6,9 +6,7 @@
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
 import ru.spb.petrk.interpreter.evalbased.SymTab;
 import ru.spb.petrk.interpreter.evalbased.model.FloatSequenceEvaluator;

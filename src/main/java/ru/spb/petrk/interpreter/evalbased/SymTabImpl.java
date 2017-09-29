@@ -8,7 +8,6 @@ package ru.spb.petrk.interpreter.evalbased;
 import java.util.HashMap;
 import java.util.Map;
 import ru.spb.petrk.ast.AST;
-import ru.spb.petrk.ast.LambdaExpr;
 import ru.spb.petrk.ast.ParamExpr;
 import ru.spb.petrk.ast.RefExpr;
 import ru.spb.petrk.ast.VarDeclStmt;

@@ -5,7 +5,6 @@
  */
 package ru.spb.petrk.interpreter.evalbased.model.impl;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import ru.spb.petrk.interpreter.evalbased.EvalInterruptedInterpreterException;
