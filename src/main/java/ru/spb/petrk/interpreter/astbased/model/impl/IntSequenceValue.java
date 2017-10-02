@@ -50,7 +50,7 @@ public final class IntSequenceValue implements SequenceValue {
     public Stream<Value> stream() {
         final int from = left.value();
         final int to = right.value();
-        return IntStream.rangeClosed(from, to).mapToObj(i -> new IntValueImpl(i));
+        return IntStream.rangeClosed(from, to).parallel().mapToObj(i -> new IntValueImpl(i));
     }
 
     @Override

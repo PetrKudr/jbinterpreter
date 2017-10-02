@@ -244,7 +244,7 @@ public final class ASTInterpreter implements Interpreter {
         public Value visitReduceOperator(ReduceOperator op) {
             SequenceValue seq = eval(SequenceValue.class, op.getSequence());
             Value neutral = eval(op.getNeutralValue());
-            Value reduced = seq.stream().parallel().reduce(neutral, (left, right)-> {
+            Value reduced = seq.stream().reduce(neutral, (left, right)-> {
                 Map<String, Value> lambdaSymTab = new HashMap(2);
                 lambdaSymTab.put(op.getLambda().getParams().get(0).getName(), left);
                 lambdaSymTab.put(op.getLambda().getParams().get(1).getName(), right);
