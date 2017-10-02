@@ -30,6 +30,10 @@ import ru.spb.petrk.interpreter.InterpreterListener;
  */
 public class ShowInterpretationTask implements Runnable {
     
+    private final static int OUTPUT_THRESHOLD = 8 * 1024; // 8Kb 
+    
+    private final static int OUTPUT_CANCELLED = -1;
+    
     private final static Logger LOG = Logger.getLogger(ShowInterpretationTask.class.getName());
     
     private final AtomicBoolean canceller = new AtomicBoolean();
@@ -41,6 +45,8 @@ public class ShowInterpretationTask implements Runnable {
     private final JTextArea output; 
     
     private final Interpreter interpreter;
+
+    private int charsWritten = 0;
 
     public ShowInterpretationTask(RSyntaxTextArea input, JTextArea output, Interpreter interpreter) {
         this.text = input.getText();
@@ -68,22 +74,26 @@ public class ShowInterpretationTask implements Runnable {
 
                 @Override
                 public void onOut(String msg) {
-                    SwingUtilities.invokeLater(() -> {
-                        hadOutput = true;
-                        out.print(msg);
-                    });
+                    if (checkSizeOfOutput(msg.length())) {
+                        SwingUtilities.invokeLater(() -> {
+                            hadOutput = true;
+                            out.print(msg);
+                        });
+                    }
                 }
 
                 @Override
                 public void onError(InterpreterError error) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (hadOutput) {
-                            out.println();
-                            hadOutput = false;
-                        }
-                        out.println(error.toString());
-                        highlightError(input, error);
-                    });
+                    if (checkSizeOfOutput(error.getMessage().length())) {
+                        SwingUtilities.invokeLater(() -> {
+                            if (hadOutput) {
+                                out.println();
+                                hadOutput = false;
+                            }
+                            out.println(error.toString());
+                            highlightError(input, error);
+                        });
+                    }
                 }
             }, canceller);
         } catch (Throwable thr) {
@@ -135,39 +145,39 @@ public class ShowInterpretationTask implements Runnable {
         }
     }
     
+    private boolean checkSizeOfOutput(int added) {
+        if (OUTPUT_THRESHOLD == OUTPUT_CANCELLED) {
+            return true; // threshold is disabled
+        }
+        if (charsWritten == OUTPUT_CANCELLED) {
+            return false; // task was cancelled
+        }
+        charsWritten += added;
+        if (charsWritten > OUTPUT_THRESHOLD) {
+            Component topComponent = output;
+            while (topComponent.getParent() != null) {
+                topComponent = topComponent.getParent();
+            }
+            if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
+                    topComponent, 
+                    "Interpretation prints a lot of data. Do you want to cancel interpretation?"
+            )) {
+                canceller.set(true);
+                charsWritten = OUTPUT_CANCELLED; // prevent potential future writings
+                return false;
+            } else {
+                charsWritten = 0; // reset counter and continue
+            }
+        }
+        return true;
+    }
+    
     // OutputStream adapter for JTextArea
     private class TextAreaOutputStream extends OutputStream {
-    
-        private final static int OUTPUT_THRESHOLD = 4 * 1024; // 4Kb 
-
-        private int charsWritten = 0;
         
         @Override
         public void write(int b) throws IOException {
             assert SwingUtilities.isEventDispatchThread();
-            if (charsWritten == -1) {
-                return; // task was cancelled
-            }
-            if (charsWritten == Integer.MAX_VALUE) {
-                charsWritten = 0; // corner case, reset counter
-            }
-            if (charsWritten > OUTPUT_THRESHOLD) {
-                Component topComponent = output;
-                while (topComponent.getParent() != null) {
-                    topComponent = topComponent.getParent();
-                }
-                if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                        topComponent, 
-                        "Interpretation prints a lot of data. Do you want to cancel interpretation?"
-                )) {
-                    canceller.set(true);
-                    charsWritten = -1; // prevent potential future writings
-                    return;
-                } else {
-                    charsWritten = 0; // reset counter and continue
-                }
-            }
-            ++charsWritten;
             output.append(String.valueOf((char) b));
             output.setCaretPosition(output.getDocument().getLength());
         }
