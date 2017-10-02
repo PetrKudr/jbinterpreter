@@ -41,7 +41,7 @@ public final class IntSequenceEvaluatorImpl implements IntSequenceEvaluator {
         if (canceller.get()) {
             throw new EvalInterruptedInterpreterException();
         }
-        return IntStream.rangeClosed(left.value(symTab), right.value(symTab));
+        return IntStream.rangeClosed(left.value(symTab), right.value(symTab)).parallel();
     }
     
     @Override

@@ -399,7 +399,7 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 1.1: int reduce({integers}, neutral, int int -> int)
                 IntSequenceEvaluator intInput = (IntSequenceEvaluator) input;
                 return new IntEvaluatorImpl(canceller, (st) -> 
-                        intInput.stream(st).parallel().reduce(
+                        intInput.stream(st).reduce(
                                 neutral.asInt().value(st), 
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
@@ -415,7 +415,7 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 1.2: int reduce({doubles}, neutral, double double -> int)
                 FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new IntEvaluatorImpl(canceller, (st) -> 
-                        Double.valueOf(floatInput.stream(st).parallel().reduce(
+                        Double.valueOf(floatInput.stream(st).reduce(
                                 neutral.asFloat().value(st), 
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
@@ -442,7 +442,7 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 2.1: double reduce({integers}, neutral, int int -> double)
                 IntSequenceEvaluator intInput = (IntSequenceEvaluator) input;
                 return new FloatEvaluatorImpl(canceller, (st) -> 
-                        intInput.asFloatSequence().stream(st).parallel().reduce(
+                        intInput.asFloatSequence().stream(st).reduce(
                                 neutral.asFloat().value(st), 
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
@@ -458,7 +458,7 @@ public final class EvalInterpreter implements Interpreter {
                 // Case 2.2: double reduce({doubles}, neutral, double double -> double)
                 FloatSequenceEvaluator floatInput = (FloatSequenceEvaluator) input;
                 return new FloatEvaluatorImpl(canceller, (st) -> 
-                        floatInput.stream(st).parallel().reduce(
+                        floatInput.stream(st).reduce(
                                 neutral.asFloat().value(st), 
                                 (l, r) -> {
                                     SymTab reduceSymTab = SymTab.of(
@@ -485,21 +485,21 @@ public final class EvalInterpreter implements Interpreter {
                 SequenceSequenceEvaluator seqInput = (SequenceSequenceEvaluator) input;
                 if (EvalKindUtils.isIntSequenceEval(reduce)) {
                     return new MappedIntSequenceEvaluatorImpl<>(canceller, seqInput, (in, st) ->
-                            ((IntSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
+                            ((IntSequenceEvaluator) in.stream(st).reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
                                 return reduce.bind(symTab);
                             })).stream(st)
                     );
                 } else if (EvalKindUtils.isFloatSequenceEval(reduce)) {
                     return new MappedFloatSequenceEvaluatorImpl<>(canceller, seqInput, (in, st) ->
-                            ((FloatSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
+                            ((FloatSequenceEvaluator) in.stream(st).reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
                                 return reduce.bind(symTab);
                             })).stream(st)
                     );
                 } else if (EvalKindUtils.isSequenceSequenceEval(reduce)) {
                     return new MappedSequenceSequenceEvaluatorImpl<>(canceller, seqInput, (in, st) ->
-                            ((SequenceSequenceEvaluator) in.stream(st).parallel().reduce(neutral, (l, r) -> {
+                            ((SequenceSequenceEvaluator) in.stream(st).reduce(neutral, (l, r) -> {
                                 SymTab symTab = SymTab.of(lambda, l, r);
                                 return reduce.bind(symTab);
                             })).stream(st)
